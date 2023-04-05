@@ -72,6 +72,10 @@ If it's not the [latest version](https://github.com/BuilderIO/ai-shell/tags), ru
 npm update -g @builder.io/ai-shell
 ```
 
+## Motivation
+
+I am not a bash wizard, and am dying for access to the copilot CLI, and got impactient.
+
 ## TODO
 
 - Support more shells and operating systems (e.g. windows)
