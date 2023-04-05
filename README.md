@@ -64,7 +64,7 @@ Check the installed version with:
 ai-shell --version
 ```
 
-If it's not the [latest version](https://github.com/BuilderIO/ai-shell/releases/latest), run:
+If it's not the [latest version](https://github.com/BuilderIO/ai-shell/tags), run:
 
 ```bash
 npm update -g @builder.io/ai-shell

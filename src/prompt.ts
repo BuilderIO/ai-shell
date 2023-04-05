@@ -1,5 +1,5 @@
 import * as p from '@clack/prompts';
-import { bgCyan, bgBlack } from 'kolorist';
+import { bgCyan, black } from 'kolorist';
 import { commandName } from './helpers/constants';
 import { getConfig } from './helpers/config';
 import { KnownError } from './helpers/error';
@@ -8,7 +8,7 @@ import {
   getRevision,
   getScriptAndInfo,
 } from './helpers/completion';
-import { $, execaCommand } from 'execa';
+import { execaCommand } from 'execa';
 
 const sample = <T>(arr: T[]): T | undefined => {
   const len = arr == null ? 0 : arr.length;
