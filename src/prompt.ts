@@ -68,10 +68,7 @@ async function promptForRevision() {
   return (await group).prompt;
 }
 
-export async function prompt({
-  defaultPrompt,
-  usePrompt,
-}: { defaultPrompt?: string; usePrompt?: string } = {}) {
+export async function prompt({ usePrompt }: { usePrompt?: string } = {}) {
   console.clear();
 
   const { OPENAI_KEY: key } = await getConfig();
@@ -84,7 +81,7 @@ export async function prompt({
 
   p.intro(`${bgCyan(black(` ${commandName} `))}`);
 
-  const thePrompt = usePrompt || (await getPrompt(defaultPrompt));
+  const thePrompt = usePrompt || (await getPrompt());
 
   const spin = p.spinner();
   spin.start(`Loading...`);

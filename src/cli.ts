@@ -18,6 +18,7 @@ cli(
     commands: [config],
   },
   (argv) => {
-    prompt({ defaultPrompt: argv.flags.prompt });
+    const promptText = argv._.join(' ');
+    prompt({ usePrompt: promptText });
   }
 );
