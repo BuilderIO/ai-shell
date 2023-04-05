@@ -1,7 +1,7 @@
 {
-  "name": "@builder.io/aiterminal",
+  "name": "@builder.io/ai-shell",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "dependencies": {
     "@clack/core": "latest",
@@ -18,15 +18,24 @@
     "type": "git",
     "url": "https://github.com/BuilderIO/aiterminal"
   },
+  "files": [
+    "dist"
+  ],
+  "bin": {
+    "ai-shell": "./dist/src/cli.mjs",
+    "?ai": "./dist/src/cli.mjs"
+  },
   "scripts": {
-    "start": "jiti ./src/index.ts",
-    "lint:fix": "prettier --write ."
+    "start": "jiti ./src/cli.ts",
+    "lint:fix": "prettier --write .",
+    "build": "pkgroll"
   },
   "devDependencies": {
     "@types/dedent": "^0.7.0",
     "@types/ini": "^1.3.31",
     "@types/node": "^18.15.11",
     "jiti": "^1.17.0",
+    "pkgroll": "^1.9.0",
     "prettier": "^2.8.7"
   }
 }

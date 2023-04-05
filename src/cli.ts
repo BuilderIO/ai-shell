@@ -6,7 +6,7 @@ import { prompt } from './prompt';
 
 cli(
   {
-    name: commandName.replace('?', ''),
+    name: commandName,
     version: version,
     flags: {
       prompt: {
@@ -18,6 +18,6 @@ cli(
     commands: [config],
   },
   (argv) => {
-    prompt(argv.flags.prompt);
+    prompt({ defaultPrompt: argv.flags.prompt });
   }
 );

@@ -46,7 +46,7 @@ type ValidConfig = {
   [Key in ConfigKeys]: ReturnType<(typeof configParsers)[Key]>;
 };
 
-const configPath = path.join(os.homedir(), '.aiterminal');
+const configPath = path.join(os.homedir(), '.ai-shell');
 
 const fileExists = (filePath: string) =>
   fs.lstat(filePath).then(

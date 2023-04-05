@@ -1,18 +1,37 @@
 import * as p from '@clack/prompts';
 import color from 'picocolors';
-import { commandName, repoUrl } from './helpers/constants';
+import { commandName } from './helpers/constants';
 import { getConfig } from './helpers/config';
 import { KnownError } from './helpers/error';
-import { getScriptAndInfo } from './helpers/completion';
+import {
+  getExplanation,
+  getRevision,
+  getScriptAndInfo,
+} from './helpers/completion';
 import { $, execaCommand } from 'execa';
 
-async function getPrompt() {
+const sample = <T>(arr: T[]): T | undefined => {
+  const len = arr == null ? 0 : arr.length;
+  return len ? arr[Math.floor(Math.random() * len)] : undefined;
+};
+
+const examples = [
+  'delete all log files',
+  'list js files',
+  'fetch the world time api',
+  'list all commits',
+  'change to my most recently open branch',
+];
+
+async function getPrompt(prompt?: string) {
   const group = p.group(
     {
       prompt: () =>
         p.text({
           message: 'What would you like me to to do?',
-          placeholder: 'Delete all *.log files',
+          placeholder: `e.g. ${sample(examples)}`,
+          initialValue: prompt,
+          defaultValue: 'Say hello',
           validate: (value) => {
             if (!value) return 'Please enter a prompt.';
           },
@@ -20,7 +39,7 @@ async function getPrompt() {
     },
     {
       onCancel: () => {
-        p.cancel('Operation cancelled.');
+        p.cancel('Goodbye!');
         process.exit(0);
       },
     }
@@ -28,58 +47,110 @@ async function getPrompt() {
   return (await group).prompt;
 }
 
-export async function prompt(usePrompt?: string) {
+async function promptForRevision() {
+  const group = p.group(
+    {
+      prompt: () =>
+        p.text({
+          message: 'What would you like me to to change in this script?',
+          placeholder: 'e.g. change the folder name',
+          validate: (value) => {
+            if (!value) return 'Please enter a prompt.';
+          },
+        }),
+    },
+    {
+      onCancel: () => {
+        p.cancel('Goodbye!');
+        process.exit(0);
+      },
+    }
+  );
+  return (await group).prompt;
+}
+
+export async function prompt({
+  defaultPrompt,
+  usePrompt,
+}: { defaultPrompt?: string; usePrompt?: string } = {}) {
   console.clear();
 
   const { OPENAI_KEY: key } = await getConfig();
   if (!key) {
     throw new KnownError(
-      'Please set your OpenAI API key via `aicommits config set OPENAI_KEY=<your token>`'
+      'Please set your OpenAI API key via `ai-shell config set OPENAI_KEY=<your token>`'
     );
   }
   parseAssert('OPENAI_KEY', key.startsWith('sk-'), 'Must start with "sk-"');
 
   p.intro(`${color.bgCyan(color.black(` ${commandName} `))}`);
 
-  const thePrompt = usePrompt || (await getPrompt());
+  const thePrompt = usePrompt || (await getPrompt(defaultPrompt));
 
-  p.log.step(`Loading...`);
   const spin = p.spinner();
-  spin.start();
-  const { script, info } = await getScriptAndInfo({ prompt: thePrompt, key });
-  spin.stop();
-  p.log.step(`Your script:`);
+  spin.start(`Loading...`);
+  let { script, info } = await getScriptAndInfo({ prompt: thePrompt, key });
+  spin.stop(`Your script:`);
   p.log.message(script);
-  p.log.step(`Explanation:`);
+  if (!info) {
+    const spin = p.spinner();
+    spin.start(`Getting explanation...`);
+    info = await getExplanation({ script, key });
+    spin.stop(`Explanation:`);
+  }
   p.log.message(info);
 
+  await runOrReviseFlow(script, key);
+}
+
+async function runOrReviseFlow(script: string, key: string) {
   const answer = await p.select({
     message: 'Run this script?',
     options: [
-      { label: 'Yes', value: 'yes', hint: 'Lets go!' },
-      { label: 'Retry', value: 'retry', hint: 'Generate a new result' },
-      { label: 'New prompt', value: 'new', hint: 'Modify your prompt' },
-      { label: 'Cancel', value: 'cancel', hint: 'Exit the program' },
+      { label: '✅ Yes', value: 'yes', hint: 'Lets go!' },
+      {
+        label: '📝 Revise',
+        value: 'revise',
+        hint: 'Give feedback your prompt and get a new result',
+      },
+      { label: '❌ Cancel', value: 'cancel', hint: 'Exit the program' },
     ],
   });
 
-  const retry = answer === 'retry';
   const confirmed = answer === 'yes';
   const cancel = answer === 'cancel';
-  const newPrompt = answer === 'new';
+  const revisePrompt = answer === 'revise';
 
-  if (retry) {
-    await prompt(thePrompt);
-  } else if (newPrompt) {
-    await prompt();
+  if (revisePrompt) {
+    await revisionFlow(script, key);
   } else if (confirmed) {
     p.outro(`Running: ${script}`);
     console.log('');
     await execaCommand(script, { stdio: 'inherit' });
   } else if (cancel) {
-    p.cancel('Operation cancelled.');
+    p.cancel('Goodbye!');
     process.exit(0);
   }
+}
+
+async function revisionFlow(currentScript: string, key: string) {
+  const revision = await promptForRevision();
+  const spin = p.spinner();
+  spin.start(`Loading...`);
+  const script = await getRevision({
+    prompt: revision,
+    code: currentScript,
+    key,
+  });
+  spin.stop(`Your new script:`);
+  p.log.message(script);
+  const infoSpin = p.spinner();
+  infoSpin.start(`Getting explanation...`);
+  const info = await getExplanation({ script, key });
+  infoSpin.stop(`Explanation:`);
+  p.log.message(info);
+
+  await runOrReviseFlow(script, key);
 }
 
 const parseAssert = (name: string, condition: any, message: string) => {
