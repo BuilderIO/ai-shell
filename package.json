@@ -1,6 +1,6 @@
 {
   "name": "@builder.io/ai-shell",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "type": "module",
   "dependencies": {
     "@clack/core": "latest",
