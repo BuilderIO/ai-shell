@@ -2,7 +2,7 @@
 
 A CLI that converts natural language to shell commands.
 
-Inspired by [Gitbhub Copilot X CLI](https://githubnext.com/projects/copilot-cli/), but open source for everyone.
+Inspired by [Github Copilot X CLI](https://githubnext.com/projects/copilot-cli/), but open source for everyone.
 
 ## Setup
 
@@ -28,14 +28,14 @@ Inspired by [Gitbhub Copilot X CLI](https://githubnext.com/projects/copilot-cli/
 
 ## Usage
 
-```bashbash
-?ai <prompt>
+```bash
+ai <prompt>
 ```
 
 For example:
 
 ```bash
-?ai list all log files
+ai list all log files
 ```
 
 Then you will get an output like this, where you can choose to run the suggested command, revise the command via a prompt, or cancel:
