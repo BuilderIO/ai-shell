@@ -1,4 +1,4 @@
-import { dim } from 'picocolors';
+import { dim } from 'kolorist';
 import { version } from '../../package.json';
 
 export class KnownError extends Error {}

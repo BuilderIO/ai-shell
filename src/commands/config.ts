@@ -1,5 +1,5 @@
 import { command } from 'cleye';
-import color from 'picocolors';
+import { red } from 'kolorist';
 import { hasOwn, getConfig, setConfigs } from '../helpers/config.js';
 import { KnownError, handleCliError } from '../helpers/error.js';
 
@@ -31,7 +31,7 @@ export default command(
 
       throw new KnownError(`Invalid mode: ${mode}`);
     })().catch((error) => {
-      console.error(`${color.red('✖')} ${error.message}`);
+      console.error(`${red('✖')} ${error.message}`);
       handleCliError(error);
       process.exit(1);
     });

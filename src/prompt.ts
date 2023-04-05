@@ -1,5 +1,5 @@
 import * as p from '@clack/prompts';
-import color from 'picocolors';
+import { bgCyan, bgBlack } from 'kolorist';
 import { commandName } from './helpers/constants';
 import { getConfig } from './helpers/config';
 import { KnownError } from './helpers/error';
@@ -82,7 +82,7 @@ export async function prompt({
   }
   parseAssert('OPENAI_KEY', key.startsWith('sk-'), 'Must start with "sk-"');
 
-  p.intro(`${color.bgCyan(color.black(` ${commandName} `))}`);
+  p.intro(`${bgCyan(black(` ${commandName} `))}`);
 
   const thePrompt = usePrompt || (await getPrompt(defaultPrompt));
 
@@ -125,7 +125,7 @@ async function runOrReviseFlow(script: string, key: string) {
   } else if (confirmed) {
     p.outro(`Running: ${script}`);
     console.log('');
-    await execaCommand(script, { stdio: 'inherit' }).catch(err => {
+    await execaCommand(script, { stdio: 'inherit' }).catch((err) => {
       // Nothign needed, it'll output to stderr
     });
   } else if (cancel) {
