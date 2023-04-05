@@ -69,8 +69,6 @@ async function promptForRevision() {
 }
 
 export async function prompt({ usePrompt }: { usePrompt?: string } = {}) {
-  console.clear();
-
   const { OPENAI_KEY: key } = await getConfig();
   if (!key) {
     throw new KnownError(
