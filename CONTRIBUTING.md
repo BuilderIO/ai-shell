@@ -39,11 +39,11 @@ Since pkgroll knows the entry-point is a binary (being in `package.json#bin`), i
 You can run the distribution file in any directory:
 
 ```sh
-./dist/src/cli.mjs
+./dist/cli.mjs
 ```
 
 Or in non-UNIX environments, you can use Node.js to run the file:
 
 ```sh
-node ./dist/src/cli.mjs
+node ./dist/cli.mjs
 ```

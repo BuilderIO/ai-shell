@@ -16,18 +16,19 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/BuilderIO/aiterminal"
+    "url": "https://github.com/BuilderIO/ai-shell"
   },
   "files": [
     "dist"
   ],
   "bin": {
-    "ai-shell": "./dist/src/cli.mjs",
-    "?ai": "./dist/src/cli.mjs"
+    "ai-shell": "./dist/cli.mjs",
+    "?ai": "./dist/cli.mjs"
   },
   "scripts": {
     "start": "jiti ./src/cli.ts",
     "lint:fix": "prettier --write .",
+    "typecheck": "tsc",
     "build": "pkgroll"
   },
   "devDependencies": {

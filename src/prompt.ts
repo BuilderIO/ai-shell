@@ -18,9 +18,8 @@ const sample = <T>(arr: T[]): T | undefined => {
 const examples = [
   'delete all log files',
   'list js files',
-  'fetch the world time api',
+  'fetch me a random joke',
   'list all commits',
-  'change to my most recently open branch',
 ];
 
 async function getPrompt(prompt?: string) {
@@ -126,7 +125,9 @@ async function runOrReviseFlow(script: string, key: string) {
   } else if (confirmed) {
     p.outro(`Running: ${script}`);
     console.log('');
-    await execaCommand(script, { stdio: 'inherit' });
+    await execaCommand(script, { stdio: 'inherit' }).catch(err => {
+      // Nothign needed, it'll output to stderr
+    });
   } else if (cancel) {
     p.cancel('Goodbye!');
     process.exit(0);
