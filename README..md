@@ -1,6 +1,6 @@
 # AI Shell
 
-A CLI that converts natural lagnuage to shell commands.
+A CLI that converts natural language to shell commands.
 
 Inspired by [Gitbhub Copilot X CLI](https://githubnext.com/projects/copilot-cli/), but open source for everyone.
 
@@ -66,7 +66,7 @@ ai-shell --version
 
 If it's not the [latest version](https://github.com/BuilderIO/ai-shell/releases/latest), run:
 
-```bashsh
+```bash
 npm update -g @builder.io/ai-shell
 ```
 

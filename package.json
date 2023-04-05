@@ -22,14 +22,14 @@
   ],
   "bin": {
     "ai-shell": "./dist/cli.mjs",
-    "ai?": "./dist/cli.mjs"
+    "ai": "./dist/cli.mjs"
   },
   "scripts": {
     "start": "jiti ./src/cli.ts",
     "lint:fix": "prettier --write .",
     "typecheck": "tsc",
     "build": "pkgroll",
-    "release:patch": "npm run build && npm version patch && npm publish && git push --follow-tags"
+    "release:patch": "npm run build && npm version patch && npm run build && npm publish && git push --follow-tags"
   },
   "devDependencies": {
     "@types/dedent": "^0.7.0",
