@@ -74,7 +74,7 @@ npm update -g @builder.io/ai-shell
 
 ## Motivation
 
-I am not a bash wizard, and am dying for access to the copilot CLI, and got impactient.
+I am not a bash wizard, and am dying for access to the copilot CLI, and got impatient.
 
 ## TODO
 
