@@ -77,6 +77,7 @@ export async function prompt({ usePrompt }: { usePrompt?: string } = {}) {
   }
   parseAssert('OPENAI_KEY', key.startsWith('sk-'), 'Must start with "sk-"');
 
+  console.log('');
   p.intro(`${bgCyan(black(` ${commandName} `))}`);
 
   const thePrompt = usePrompt || (await getPrompt());
