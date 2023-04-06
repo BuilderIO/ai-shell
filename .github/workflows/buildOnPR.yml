@@ -1,0 +1,23 @@
+name: Build on PR
+
+on: [pull_request, push]
+
+jobs:
+  run-build:
+    name: Run Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18
+
+      - name: Install Node.js dependencies
+        run: npm install
+      - name: Run build
+        run: npm run build
+
