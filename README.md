@@ -85,3 +85,10 @@ I am not a bash wizard, and am dying for access to the copilot CLI, and got impa
 
 - Thanks to Github Copilot for their amazing tools and the idea for this
 - Thanks to Hassan and his work on [aicommits](https://github.com/Nutlope/aicommits) which inspired the workflow and some parts of the code and flows
+
+## Contributing
+
+## Contributing
+
+If you want to help fix a bug or implement a feature in [Issues](https://github.com/BuilderIO/ai-shell/issues) (tip: look out for the `help wanted` label), checkout the [Contribution Guide](CONTRIBUTING.md) to learn how to setup the project.
+
