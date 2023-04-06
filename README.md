@@ -2,7 +2,8 @@
 
 A CLI that converts natural language to shell commands.
 
-![ezgif com-video-to-gif](https://user-images.githubusercontent.com/844291/230181339-e7898e42-7bf0-4c14-9d2d-64de691522c6.gif)
+![Gif Demo](https://user-images.githubusercontent.com/844291/230413167-773845e7-4c9f-44a5-909c-02802b5e49f6.gif)
+
 
 Inspired by [Github Copilot X CLI](https://githubnext.com/projects/copilot-cli/), but open source for everyone.
 
