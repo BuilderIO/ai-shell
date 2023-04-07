@@ -77,9 +77,6 @@ npm update -g @builder.io/ai-shell
 
 I am not a bash wizard, and am dying for access to the copilot CLI, and got impatient.
 
-## TODO
-
-- Support more shells and operating systems (e.g. windows)
 
 ## Credit
 
