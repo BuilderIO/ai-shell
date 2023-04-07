@@ -1,6 +1,7 @@
 import { OpenAIApi, Configuration } from 'openai';
 import { KnownError } from './error';
 import dedent from 'dedent';
+import { detectShell } from './os-detect';
 
 const explainInSecondRequest = true;
 
@@ -106,30 +107,36 @@ export async function getRevision({
 
 function getExplanationPrompt(script: string) {
   return dedent`
-    ${explainBash}
+    ${explainScript}
 
     The script: ${script}
   `;
 }
 
-const explainBash = dedent`
-  Then please describe the bash script in plain english, step by step, what exactly it does.
+const shellDetails = dedent`
+  The target terminal is ${detectShell}.
+`;
+
+const explainScript = dedent`
+  Then please describe the script in plain english, step by step, what exactly it does.
   Please describe succintly, use as few words as possible, do not be verbose. 
   If there are multiple steps, please display them as a list.
 `;
 
 const generationDetails = dedent`
-  Please only reply with the single line bash command surrounded by 3 backticks. It should be able to be directly run in a bash terminal. Do not include any other text.
+  Please only reply with the single line command surrounded by 3 backticks. It should be able to be directly run in a terminal. Do not include any other text.
 `;
 
 // TODO: gather the current OS (Windows, Mac, Linux) and add that to the prompt that it should support this system.
 function getFullPrompt(prompt: string) {
   return dedent`
-    I will give you a prompt to create a single line bash command that one can enter in a terminal and run, based on what is asked in the prompt.
+    I will give you a prompt to create a single line command that one can enter in a terminal and run, based on what is asked in the prompt.
+
+    ${shellDetails}
 
     ${generationDetails}
 
-    ${explainInSecondRequest ? '' : explainBash}
+    ${explainInSecondRequest ? '' : explainScript}
 
     The prompt is: ${prompt}
   `;
@@ -137,7 +144,7 @@ function getFullPrompt(prompt: string) {
 
 function getRevisionPrompt(prompt: string, code: string) {
   return dedent`
-    Please update the following bash script based on what is asked in the following prompt.
+    Please update the following script based on what is asked in the following prompt.
 
     The script: ${code}
 
