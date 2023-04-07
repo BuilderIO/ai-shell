@@ -27,6 +27,7 @@
   "scripts": {
     "start": "jiti ./src/cli.ts",
     "lint:fix": "prettier --write .",
+    "lint": "prettier --check .",
     "typecheck": "tsc",
     "build": "pkgroll",
     "release:patch": "npm run build && npm version patch && npm run build && npm publish && git push --follow-tags"
