@@ -121,8 +121,11 @@ async function runOrReviseFlow(script: string, key: string) {
   } else if (confirmed) {
     p.outro(`Running: ${script}`);
     console.log('');
-    await execaCommand(script, { stdio: 'inherit', shell: true }).catch((err) => {
-      // Nothign needed, it'll output to stderr
+    await execaCommand(script, {
+      stdio: 'inherit',
+      shell: process.env.SHELL || true,
+    }).catch((err) => {
+      // Nothing needed, it'll output to stderr
     });
   } else if (cancel) {
     p.cancel('Goodbye!');
