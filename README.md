@@ -4,7 +4,6 @@ A CLI that converts natural language to shell commands.
 
 ![Gif Demo](https://user-images.githubusercontent.com/844291/230413167-773845e7-4c9f-44a5-909c-02802b5e49f6.gif)
 
-
 Inspired by [Github Copilot X CLI](https://githubnext.com/projects/copilot-cli/), but open source for everyone.
 
 ## Setup
@@ -77,7 +76,6 @@ npm update -g @builder.io/ai-shell
 
 I am not a bash wizard, and am dying for access to the copilot CLI, and got impatient.
 
-
 ## Credit
 
 - Thanks to Github Copilot for their amazing tools and the idea for this
@@ -86,4 +84,3 @@ I am not a bash wizard, and am dying for access to the copilot CLI, and got impa
 ## Contributing
 
 If you want to help fix a bug or implement a feature in [Issues](https://github.com/BuilderIO/ai-shell/issues) (tip: look out for the `help wanted` label), checkout the [Contribution Guide](CONTRIBUTING.md) to learn how to setup the project.
-
