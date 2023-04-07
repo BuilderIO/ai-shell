@@ -7,13 +7,11 @@ export function detectShell() {
     if (os.platform() === 'win32') {
       return 'powershell';
     }
-    // otherwise return current shell
+    // otherwise return current shell; default to bash
     return path.basename(os.userInfo().shell ?? 'bash');
   } catch (err: unknown) {
     if (err instanceof Error) {
-      return {
-        message: `Shell detection failed unexpectedly: (${err.message})`,
-      };
+      throw new Error(`Shell detection failed unexpectedly: ${err.message}`);
     }
   }
 }
