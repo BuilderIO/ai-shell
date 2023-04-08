@@ -83,19 +83,22 @@ export async function prompt({ usePrompt }: { usePrompt?: string } = {}) {
   const thePrompt = usePrompt || (await getPrompt());
   const spin = p.spinner();
   spin.start(`Loading...`);
-  let { readInfo, readScript } = await getScriptAndInfo({ prompt: thePrompt, key });
+  let { readInfo, readScript } = await getScriptAndInfo({
+    prompt: thePrompt,
+    key,
+  });
   spin.stop(`Your script:`);
-  p.log.message('')
+  p.log.message('');
   const script = await readScript(process.stdout.write.bind(process.stdout));
-  p.log.message('')
+  p.log.message('');
   spin.start(`Getting explanation...`);
   let info = await readInfo(process.stdout.write.bind(process.stdout));
   if (!info) {
     const { readExplanation } = await getExplanation({ script, key });
     spin.stop(`Explanation:`);
-    p.log.message('')
+    p.log.message('');
     await readExplanation(process.stdout.write.bind(process.stdout));
-    p.log.message('')
+    p.log.message('');
   }
 
   await runOrReviseFlow(script, key);
@@ -146,9 +149,9 @@ async function revisionFlow(currentScript: string, key: string) {
     key,
   });
   spin.stop(`Your new script:`);
-  p.log.message('')
+  p.log.message('');
   const script = await readScript(process.stdout.write.bind(process.stdout));
-  p.log.message('')
+  p.log.message('');
   const infoSpin = p.spinner();
   infoSpin.start(`Getting explanation...`);
   const { readExplanation } = await getExplanation({ script, key });

@@ -2,7 +2,7 @@ import { OpenAIApi, Configuration } from 'openai';
 import dedent from 'dedent';
 import { IncomingMessage } from 'http';
 import { KnownError } from './error';
-import { streamToIterable } from './streamToIterable';
+import { streamToIterable } from './stream-to-iterable';
 import { detectShell } from './os-detect';
 
 const explainInSecondRequest = true;
@@ -21,19 +21,23 @@ export async function getScriptAndInfo({
   key: string;
   model?: string;
 }) {
-	const fullPrompt = getFullPrompt(prompt);
-	const stream = await generateCompletion({
-		prompt: fullPrompt,
-		number: 1,
-		key,
-		model
-	});
-	const iterableStream = streamToIterable(stream);
-	const codeBlock = '```';
-	return {
-		readScript: readData(iterableStream, () => true, codeBlock),
-		readInfo: readData(iterableStream, (content) => content.endsWith(codeBlock), codeBlock)
-	};
+  const fullPrompt = getFullPrompt(prompt);
+  const stream = await generateCompletion({
+    prompt: fullPrompt,
+    number: 1,
+    key,
+    model,
+  });
+  const iterableStream = streamToIterable(stream);
+  const codeBlock = '```';
+  return {
+    readScript: readData(iterableStream, () => true, codeBlock),
+    readInfo: readData(
+      iterableStream,
+      (content) => content.endsWith(codeBlock),
+      codeBlock
+    ),
+  };
 }
 
 export async function generateCompletion({
@@ -47,23 +51,26 @@ export async function generateCompletion({
   model?: string;
   key: string;
 }) {
-	const openAi = getOpenAi(key);
-	try {
-		const completion = await openAi.createChatCompletion({
-			model: model || 'gpt-3.5-turbo',
-			messages: [{ role: 'user', content: prompt }],
-			n: Math.min(number, 10),
-			stream: true
-		}, { responseType: 'stream' });
+  const openAi = getOpenAi(key);
+  try {
+    const completion = await openAi.createChatCompletion(
+      {
+        model: model || 'gpt-3.5-turbo',
+        messages: [{ role: 'user', content: prompt }],
+        n: Math.min(number, 10),
+        stream: true,
+      },
+      { responseType: 'stream' }
+    );
 
-		return completion.data as unknown as IncomingMessage;
-	} catch (err) {
-		const errorAsAny = err as any;
-		if (errorAsAny.code === 'ENOTFOUND') {
-			throw new KnownError(
-				`Error connecting to ${errorAsAny.hostname} (${errorAsAny.syscall}). Are you connected to the internet?`
-			);
-		}
+    return completion.data as unknown as IncomingMessage;
+  } catch (err) {
+    const errorAsAny = err as any;
+    if (errorAsAny.code === 'ENOTFOUND') {
+      throw new KnownError(
+        `Error connecting to ${errorAsAny.hostname} (${errorAsAny.syscall}). Are you connected to the internet?`
+      );
+    }
 
     throw errorAsAny;
   }
@@ -78,86 +85,93 @@ export async function getExplanation({
   key: string;
   model?: string;
 }) {
-	const prompt = getExplanationPrompt(script);
-	const stream = await generateCompletion({
-		prompt,
-		key,
-		number: 1,
-		model
-	});
-	const iterableStream = streamToIterable(stream);
-	return { readExplanation: readData(iterableStream, () => true) };
+  const prompt = getExplanationPrompt(script);
+  const stream = await generateCompletion({
+    prompt,
+    key,
+    number: 1,
+    model,
+  });
+  const iterableStream = streamToIterable(stream);
+  return { readExplanation: readData(iterableStream, () => true) };
 }
 
 export async function getRevision({
-	prompt,
-	code,
-	key,
-	model
+  prompt,
+  code,
+  key,
+  model,
 }: {
   prompt: string;
   code: string;
   key: string;
   model?: string;
 }) {
-	const fullPrompt = getRevisionPrompt(prompt, code);
-	const stream = await generateCompletion({
-		prompt: fullPrompt,
-		key,
-		number: 1,
-		model
-	});
-	const iterableStream = streamToIterable(stream);
-	return {
-		readScript: readData(iterableStream, () => true, '```')
-	};
+  const fullPrompt = getRevisionPrompt(prompt, code);
+  const stream = await generateCompletion({
+    prompt: fullPrompt,
+    key,
+    number: 1,
+    model,
+  });
+  const iterableStream = streamToIterable(stream);
+  return {
+    readScript: readData(iterableStream, () => true, '```'),
+  };
 }
 
-const readData = (iterableStream: AsyncGenerator<string, void>, startSignal: (content: string) => boolean, excluded?: string) =>
-	(writer: (data: string) => void): Promise<string> =>
-		new Promise(async (resolve) => {
-			let data = '';
-			let content = '';
-			let dataStart = false;
+const readData =
+  (
+    iterableStream: AsyncGenerator<string, void>,
+    startSignal: (content: string) => boolean,
+    excluded?: string
+  ) =>
+  (writer: (data: string) => void): Promise<string> =>
+    new Promise(async (resolve) => {
+      let data = '';
+      let content = '';
+      let dataStart = false;
 
-			for await (const chunk of iterableStream) {
-				const payloads = chunk.toString().split('\n\n');
+      for await (const chunk of iterableStream) {
+        const payloads = chunk.toString().split('\n\n');
 
-				for (const payload of payloads) {
-					if (payload.includes('[DONE]')) {
-						dataStart = false;
-						resolve(data);
-						return;
-					}
+        for (const payload of payloads) {
+          if (payload.includes('[DONE]')) {
+            dataStart = false;
+            resolve(data);
+            return;
+          }
 
-					if (payload.startsWith('data:')) {
-						content = parseContent(payload);
-						if (!dataStart && content.includes(excluded ?? '')) {
-							dataStart = startSignal(content);
-							if (excluded) break;
-						}
+          if (payload.startsWith('data:')) {
+            content = parseContent(payload);
+            if (!dataStart && content.includes(excluded ?? '')) {
+              dataStart = startSignal(content);
+              if (excluded) break;
+            }
 
-						if (dataStart && content) {
-							const contentWithoutExcluded = excluded ? content.replaceAll(excluded, '') : content;
-							data += contentWithoutExcluded;
-							writer(contentWithoutExcluded);
-						}
-					}
-				}
-			}
+            if (dataStart && content) {
+              const contentWithoutExcluded = excluded
+                ? content.replaceAll(excluded, '')
+                : content;
+              data += contentWithoutExcluded;
+              writer(contentWithoutExcluded);
+            }
+          }
+        }
+      }
 
-			function parseContent(payload: string): string {
-				const data = payload.replaceAll(/(\n)?^data:\s*/g, '');
-				try {
-					const delta = JSON.parse(data.trim());
-					return delta.choices?.[0].delta?.content ?? '';
-				} catch (error) {
-					return `Error with JSON.parse and ${payload}.\n${error}`;
-				}
-			}
+      function parseContent(payload: string): string {
+        const data = payload.replaceAll(/(\n)?^data:\s*/g, '');
+        try {
+          const delta = JSON.parse(data.trim());
+          return delta.choices?.[0].delta?.content ?? '';
+        } catch (error) {
+          return `Error with JSON.parse and ${payload}.\n${error}`;
+        }
+      }
 
-			resolve(data);
-		});
+      resolve(data);
+    });
 
 function getExplanationPrompt(script: string) {
   return dedent`
