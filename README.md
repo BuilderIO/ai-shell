@@ -80,15 +80,21 @@ If it's not the [latest version](https://github.com/BuilderIO/ai-shell/tags), ru
 npm update -g @builder.io/ai-shell
 ```
 
+## Community
+
+Come join the [Builder.io discord](https://discord.gg/EMx6e58xnw) and chat with us in the #ai-shell-general room
+
 ## Motivation
 
 I am not a bash wizard, and am dying for access to the copilot CLI, and got impatient.
+
+
+## Contributing
+
+If you want to help fix a bug or implement a feature in [Issues](https://github.com/BuilderIO/ai-shell/issues) (tip: look out for the `help wanted` label), checkout the [Contribution Guide](CONTRIBUTING.md) to learn how to setup the project.
+
 
 ## Credit
 
 - Thanks to Github Copilot for their amazing tools and the idea for this
 - Thanks to Hassan and his work on [aicommits](https://github.com/Nutlope/aicommits) which inspired the workflow and some parts of the code and flows
-
-## Contributing
-
-If you want to help fix a bug or implement a feature in [Issues](https://github.com/BuilderIO/ai-shell/issues) (tip: look out for the `help wanted` label), checkout the [Contribution Guide](CONTRIBUTING.md) to learn how to setup the project.
