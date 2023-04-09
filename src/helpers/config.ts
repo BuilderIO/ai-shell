@@ -27,6 +27,9 @@ const configParsers = {
 
     return key;
   },
+  SILENT_MODE(key?: string) {
+    return !!key;
+  },
   model(model?: string) {
     if (!model || model.length === 0) {
       return 'gpt-3.5-turbo';
