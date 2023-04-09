@@ -125,7 +125,6 @@ Come join the [Builder.io discord](https://discord.gg/EMx6e58xnw) and chat with 
 
 <br><br>
 
-
 <p align="center">
    <a href="https://www.builder.io/m/developers">
       <picture>
