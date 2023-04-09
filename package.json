@@ -27,8 +27,8 @@
   },
   "scripts": {
     "start": "jiti ./src/cli.ts",
-    "lint:fix": "prettier --write .",
-    "lint": "prettier --check .",
+    "lint:fix": "prettier --write . && eslint --fix",
+    "lint": "prettier --check . && eslint",
     "typecheck": "tsc",
     "build": "pkgroll",
     "release:patch": "npm run build && npm version patch && npm run build && npm publish && git push --follow-tags"
@@ -37,6 +37,10 @@
     "@types/dedent": "^0.7.0",
     "@types/ini": "^1.3.31",
     "@types/node": "^18.15.11",
+    "@typescript-eslint/eslint-plugin": "^5.57.1",
+    "@typescript-eslint/parser": "^5.57.1",
+    "eslint": "^8.38.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
     "jiti": "^1.17.0",
     "pkgroll": "^1.9.0",
     "prettier": "^2.8.7",
