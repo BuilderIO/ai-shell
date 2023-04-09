@@ -9,3 +9,7 @@ Take the current operating system into account
 ## 0.0.17
 
 Minor improvements to the UX of the revision flow
+
+## 0.0.18
+
+Better error handling
