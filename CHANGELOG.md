@@ -13,3 +13,7 @@ Minor improvements to the UX of the revision flow
 ## 0.0.18
 
 Better error handling
+
+## 0.0.19
+
+Minor error message improvements
