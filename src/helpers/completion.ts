@@ -6,6 +6,7 @@ import { streamToIterable } from './stream-to-iterable';
 import { detectShell } from './os-detect';
 import { platform } from 'os';
 import type { AxiosError } from 'axios';
+import { streamToString } from './stream-to-string';
 
 const explainInSecondRequest = true;
 
@@ -76,7 +77,12 @@ export async function generateCompletion({
     }
 
     const response = error.response;
-    const message = error.response?.data;
+    const message =
+      response &&
+      JSON.parse(
+        await streamToString(response.data as unknown as IncomingMessage)
+      );
+
     const messageString = message && JSON.stringify(message, null, 2);
     if (response?.status === 429) {
       throw new KnownError(dedent`
