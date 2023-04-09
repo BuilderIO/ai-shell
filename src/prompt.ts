@@ -1,14 +1,14 @@
 import * as p from '@clack/prompts';
-import { bgCyan, black, dim } from 'kolorist';
-import { commandName } from './helpers/constants';
-import { getConfig } from './helpers/config';
-import { KnownError } from './helpers/error';
+import { execaCommand } from 'execa';
+import { cyan, dim } from 'kolorist';
 import {
   getExplanation,
   getRevision,
   getScriptAndInfo,
 } from './helpers/completion';
-import { execaCommand } from 'execa';
+import { getConfig } from './helpers/config';
+import { projectName } from './helpers/constants';
+import { KnownError } from './helpers/error';
 
 const sample = <T>(arr: T[]): T | undefined => {
   const len = arr == null ? 0 : arr.length;
@@ -78,12 +78,12 @@ export async function prompt({ usePrompt }: { usePrompt?: string } = {}) {
   parseAssert('OPENAI_KEY', key.startsWith('sk-'), 'Must start with "sk-"');
 
   console.log('');
-  p.intro(`${bgCyan(black(` ${commandName} `))}`);
+  p.intro(`${cyan(`${projectName}`)}`);
 
   const thePrompt = usePrompt || (await getPrompt());
   const spin = p.spinner();
   spin.start(`Loading...`);
-  let { readInfo, readScript } = await getScriptAndInfo({
+  const { readInfo, readScript } = await getScriptAndInfo({
     prompt: thePrompt,
     key,
   });
@@ -112,10 +112,14 @@ export async function prompt({ usePrompt }: { usePrompt?: string } = {}) {
 }
 
 async function runOrReviseFlow(script: string, key: string) {
+  const nonEmptyScript = script.trim() !== '';
+
   const answer = await p.select({
-    message: 'Run this script?',
+    message: nonEmptyScript ? 'Run this script?' : 'Revise this script?',
     options: [
-      { label: '✅ Yes', value: 'yes', hint: 'Lets go!' },
+      ...(nonEmptyScript
+        ? [{ label: '✅ Yes', value: 'yes', hint: 'Lets go!' }]
+        : []),
       {
         label: '📝 Revise',
         value: 'revise',
@@ -137,7 +141,7 @@ async function runOrReviseFlow(script: string, key: string) {
     await execaCommand(script, {
       stdio: 'inherit',
       shell: process.env.SHELL || true,
-    }).catch((err) => {
+    }).catch(() => {
       // Nothing needed, it'll output to stderr
     });
   } else if (cancel) {
