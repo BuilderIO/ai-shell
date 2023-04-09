@@ -80,9 +80,18 @@ If it's not the [latest version](https://github.com/BuilderIO/ai-shell/tags), ru
 npm update -g @builder.io/ai-shell
 ```
 
+## Common Issues
+
+##### 429
+
+Some users are reporting a 429 from OpenAI. This is due to incorrect billing setup or excessive quota usage. Please follow [this guide](https://help.openai.com/en/articles/6891831-error-code-429-you-exceeded-your-current-quota-please-check-your-plan-and-billing-details) to fix it.
+
+You can activate billing at [this link](https://platform.openai.com/account/billing/overview). Make sure to add a payment method if not under an active grant from OpenAI.
+
 ## Community
 
 Come join the [Builder.io discord](https://discord.gg/EMx6e58xnw) and chat with us in the #ai-shell-general room
+
 
 ## Motivation
 
