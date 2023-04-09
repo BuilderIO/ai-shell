@@ -34,6 +34,6 @@ Improve error messaging, again
 
 Improve error messaging, again again
 
-## 0.1.4
+## 0.1.5
 
 Improve error messaging UX, again x3
