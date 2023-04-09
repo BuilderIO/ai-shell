@@ -109,13 +109,14 @@ export async function prompt({ usePrompt }: { usePrompt?: string } = {}) {
 }
 
 async function runOrReviseFlow(script: string, key: string) {
-
   const nonEmptyScript = script.trim() !== '';
 
   const answer = await p.select({
     message: nonEmptyScript ? 'Run this script?' : 'Revise this script?',
     options: [
-      ...(nonEmptyScript ? [{ label: '✅ Yes', value: 'yes', hint: 'Lets go!' }] : []),
+      ...(nonEmptyScript
+        ? [{ label: '✅ Yes', value: 'yes', hint: 'Lets go!' }]
+        : []),
       {
         label: '📝 Revise',
         value: 'revise',
@@ -157,16 +158,16 @@ async function revisionFlow(currentScript: string, key: string) {
   });
   spin.stop(`Your new script:`);
 
-  console.log('')
+  console.log('');
   const script = await readScript(process.stdout.write.bind(process.stdout));
   console.log('');
   console.log('');
   console.log(dim('•'));
-  
+
   const infoSpin = p.spinner();
   infoSpin.start(`Getting explanation...`);
   const { readExplanation } = await getExplanation({ script, key });
-  
+
   infoSpin.stop(`Explanation:`);
   console.log('');
   await readExplanation(process.stdout.write.bind(process.stdout));
