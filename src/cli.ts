@@ -19,6 +19,6 @@ cli(
   },
   (argv) => {
     const promptText = argv._.join(' ');
-    prompt({ usePrompt: promptText });
+    prompt({ usePrompt: promptText }).catch(console.error);
   }
 );

@@ -5,6 +5,7 @@ import { KnownError } from './error';
 import { streamToIterable } from './stream-to-iterable';
 import { detectShell } from './os-detect';
 import { platform } from 'os';
+import type { AxiosError } from 'axios';
 
 const explainInSecondRequest = true;
 
@@ -66,14 +67,34 @@ export async function generateCompletion({
 
     return completion.data as unknown as IncomingMessage;
   } catch (err) {
-    const errorAsAny = err as any;
-    if (errorAsAny.code === 'ENOTFOUND') {
+    const error = err as AxiosError;
+
+    if (error.code === 'ENOTFOUND') {
       throw new KnownError(
-        `Error connecting to ${errorAsAny.hostname} (${errorAsAny.syscall}). Are you connected to the internet?`
+        `Error connecting to ${error.request.hostname} (${error.request.syscall}). Are you connected to the internet?`
       );
     }
 
-    throw errorAsAny;
+    const response = error.response;
+    const message = error.response?.data;
+    const messageString = message && JSON.stringify(message, null, 2);
+    if (response?.status === 429) {
+      throw new KnownError(dedent`
+        Request to OpenAI failed with status 429. This is due to incorrect billing setup or excessive quota usage. Please follow this guide to fix it: https://help.openai.com/en/articles/6891831-error-code-429-you-exceeded-your-current-quota-please-check-your-plan-and-billing-details
+
+        You can activate billing here: https://platform.openai.com/account/billing/overview . Make sure to add a payment method if not under an active grant from OpenAI.
+
+        Full message from OpenAI: ${messageString}
+      `);
+    } else if (response && message) {
+      throw new KnownError(dedent`
+        Request to OpenAI failed with status ${response?.status}:
+
+        t${messageString}
+      `);
+    }
+
+    throw error;
   }
 }
 
