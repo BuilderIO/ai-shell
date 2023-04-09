@@ -1,6 +1,6 @@
 import * as p from '@clack/prompts';
 import { bgCyan, black, dim } from 'kolorist';
-import { commandName } from './helpers/constants';
+import { commandName, projectName } from './helpers/constants';
 import { getConfig } from './helpers/config';
 import { KnownError } from './helpers/error';
 import {
@@ -78,7 +78,7 @@ export async function prompt({ usePrompt }: { usePrompt?: string } = {}) {
   parseAssert('OPENAI_KEY', key.startsWith('sk-'), 'Must start with "sk-"');
 
   console.log('');
-  p.intro(`${bgCyan(black(` ${commandName} `))}`);
+  p.intro(`${bgCyan(black(` ${projectName} `))}`);
 
   const thePrompt = usePrompt || (await getPrompt());
   const spin = p.spinner();
