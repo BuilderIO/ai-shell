@@ -34,6 +34,9 @@ const configParsers = {
 
     return model as TiktokenModel;
   },
+  SILENT_MODE(mode?: string) {
+    return String(mode).toLowerCase() === 'true';
+  }
 } as const;
 
 type ConfigKeys = keyof typeof configParsers;

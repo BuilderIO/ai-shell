@@ -14,11 +14,17 @@ cli(
         description: 'Prompt to run',
         alias: 'p',
       },
+      silent: {
+        type: Boolean,
+        description: 'less verbose, skip printing the command explanation ',
+        alias: 's',
+      },
     },
     commands: [config],
   },
   (argv) => {
+    const silentMode = argv.flags.silent;
     const promptText = argv._.join(' ');
-    prompt({ usePrompt: promptText });
+    prompt({ usePrompt: promptText, silentMode });
   }
 );
