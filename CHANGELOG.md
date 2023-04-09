@@ -21,3 +21,7 @@ Minor error message improvements
 ## 0.1.1
 
 Minor UX improvement ("AI Shell" vs "ai-shell")
+
+## 0.1.2
+
+Improve error messaging
