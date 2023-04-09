@@ -88,9 +88,7 @@ export async function generateCompletion({
       `);
     } else if (response && message) {
       throw new KnownError(dedent`
-        Request to OpenAI failed with status ${response?.status}:
-
-        t${messageString}
+        Request to OpenAI failed with status ${response?.status}: ${messageString}
       `);
     }
 
