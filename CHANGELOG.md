@@ -29,3 +29,7 @@ Improve error messaging
 ## 0.1.3
 
 Improve error messaging, again
+
+## 0.1.4
+
+Improve error messaging, again again

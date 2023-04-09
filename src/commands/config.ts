@@ -31,7 +31,7 @@ export default command(
 
       throw new KnownError(`Invalid mode: ${mode}`);
     })().catch((error) => {
-      console.error(`${red('✖')} ${error.message}`);
+      console.error(`\n${red('✖')} ${error.message}`);
       handleCliError(error);
       process.exit(1);
     });
