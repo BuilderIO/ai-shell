@@ -1,5 +1,5 @@
 import * as p from '@clack/prompts';
-import { bgCyan, black } from 'kolorist';
+import { bgCyan, black, dim } from 'kolorist';
 import { commandName } from './helpers/constants';
 import { getConfig } from './helpers/config';
 import { KnownError } from './helpers/error';
@@ -88,17 +88,21 @@ export async function prompt({ usePrompt }: { usePrompt?: string } = {}) {
     key,
   });
   spin.stop(`Your script:`);
-  p.log.message('');
+  console.log('');
   const script = await readScript(process.stdout.write.bind(process.stdout));
-  p.log.message('');
+  console.log('');
+  console.log('');
+  console.log(dim('•'));
   spin.start(`Getting explanation...`);
   let info = await readInfo(process.stdout.write.bind(process.stdout));
   if (!info) {
     const { readExplanation } = await getExplanation({ script, key });
     spin.stop(`Explanation:`);
-    p.log.message('');
+    console.log('');
     await readExplanation(process.stdout.write.bind(process.stdout));
-    p.log.message('');
+    console.log('');
+    console.log('');
+    console.log(dim('•'));
   }
 
   await runOrReviseFlow(script, key);
