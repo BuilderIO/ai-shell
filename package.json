@@ -1,5 +1,6 @@
 {
   "name": "@builder.io/ai-shell",
+  "description": "A CLI that converts natural language to shell commands.",
   "version": "0.1.5",
   "type": "module",
   "dependencies": {
