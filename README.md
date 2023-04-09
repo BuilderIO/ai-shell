@@ -88,10 +88,6 @@ Some users are reporting a 429 from OpenAI. This is due to incorrect billing set
 
 You can activate billing at [this link](https://platform.openai.com/account/billing/overview). Make sure to add a payment method if not under an active grant from OpenAI.
 
-## Community
-
-Come join the [Builder.io discord](https://discord.gg/EMx6e58xnw) and chat with us in the #ai-shell-general room
-
 ## Motivation
 
 I am not a bash wizard, and am dying for access to the copilot CLI, and got impatient.
@@ -104,3 +100,17 @@ If you want to help fix a bug or implement a feature in [Issues](https://github.
 
 - Thanks to Github Copilot for their amazing tools and the idea for this
 - Thanks to Hassan and his work on [aicommits](https://github.com/Nutlope/aicommits) which inspired the workflow and some parts of the code and flows
+
+## Community
+
+Come join the [Builder.io discord](https://discord.gg/EMx6e58xnw) and chat with us in the #ai-shell-general room
+
+<br><br>
+
+
+<p align="center">
+   <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/844291/230786554-eb225eeb-2f6b-4286-b8c2-535b1131744a.png">
+      <img width="250" alt="Made with love by Builder.io" src="https://user-images.githubusercontent.com/844291/230786555-a58479e4-75f3-4222-a6eb-74c5af953eac.png">
+    </picture>
+</p>
