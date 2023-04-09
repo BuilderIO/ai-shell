@@ -80,6 +80,14 @@ If it's not the [latest version](https://github.com/BuilderIO/ai-shell/tags), ru
 npm update -g @builder.io/ai-shell
 ```
 
+## Common Issues
+
+##### 429
+
+Some users are reporting a 429 from OpenAI. This is due to incorrect billing setup or excessive quota usage. Please follow [this guide](https://help.openai.com/en/articles/6891831-error-code-429-you-exceeded-your-current-quota-please-check-your-plan-and-billing-details) to fix it.
+
+You can activate billing on [this link](https://platform.openai.com/account/billing/overview). Make sure to add a payment method if not under an active grant from OpenAI:
+
 ## Motivation
 
 I am not a bash wizard, and am dying for access to the copilot CLI, and got impatient.
