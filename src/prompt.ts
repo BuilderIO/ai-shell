@@ -153,14 +153,23 @@ async function revisionFlow(currentScript: string, key: string) {
     key,
   });
   spin.stop(`Your new script:`);
-  p.log.message('');
+
+  console.log('')
   const script = await readScript(process.stdout.write.bind(process.stdout));
-  p.log.message('');
+  console.log('');
+  console.log('');
+  console.log(dim('•'));
+  
   const infoSpin = p.spinner();
   infoSpin.start(`Getting explanation...`);
   const { readExplanation } = await getExplanation({ script, key });
+  
   infoSpin.stop(`Explanation:`);
+  console.log('');
   await readExplanation(process.stdout.write.bind(process.stdout));
+  console.log('');
+  console.log('');
+  console.log(dim('•'));
 
   await runOrReviseFlow(script, key);
 }
