@@ -58,6 +58,12 @@ Then you will get an output like this, where you can choose to run the suggested
 └
 ```
 
+Note that some shells handle certain characters like the `?` or `*` or things that look like file paths specially. If you are getting strange behaviors, you can wrap the prompt in quotes to avoid issues, like below:
+
+```bash
+ai 'what is my ip address'
+```
+
 ### Upgrading
 
 Check the installed version with:
