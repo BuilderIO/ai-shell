@@ -109,10 +109,13 @@ export async function prompt({ usePrompt }: { usePrompt?: string } = {}) {
 }
 
 async function runOrReviseFlow(script: string, key: string) {
+
+  const nonEmptyScript = script.trim() !== '';
+
   const answer = await p.select({
-    message: 'Run this script?',
+    message: nonEmptyScript ? 'Run this script?' : 'Revise this script?',
     options: [
-      { label: '✅ Yes', value: 'yes', hint: 'Lets go!' },
+      ...(nonEmptyScript ? [{ label: '✅ Yes', value: 'yes', hint: 'Lets go!' }] : []),
       {
         label: '📝 Revise',
         value: 'revise',
