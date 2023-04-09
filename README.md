@@ -1,10 +1,28 @@
+<h2 align="center">
+   <picture>
+      <source media="(prefers-color-scheme: dark)" srcset="https://cdn.builder.io/api/v1/image/assets%2FYJIGb4i01jvw0SRdL5Bt%2Fb5b9997cec2c4fffb3e5c5e9bb4fed7d">
+      <img width="300" alt="AI Shell logo" src="[https://user-images.githubusercontent.com/844291/230786555-a58479e4-75f3-4222-a6eb-74c5af953eac.png](https://cdn.builder.io/api/v1/image/assets%2FYJIGb4i01jvw0SRdL5Bt%2Fb7f9d2d9911a4199a9d26f8ba210b3f8)">
+    </picture>
+</h2>
+
+<h4 align="center">
+   A CLI that converts natural language to shell commands.
+</h4>
+<p align="center">
+   <a href="https://www.npmjs.com/package/@builder.io/ai-shell"><img src="https://img.shields.io/npm/v/@builder.io/ai-shell" alt="Current version"></a>
+</p>
+
+<p align="center">
+   <img alt="Gif Demo" src="https://user-images.githubusercontent.com/844291/230413167-773845e7-4c9f-44a5-909c-02802b5e49f6.gif" >
+<p>
+
+<p align="center">
+   Inspired by the <a href="https://githubnext.com/projects/copilot-cli">Github Copilot X CLI</a>, but open source for everyone.
+</p>
+
+<br>
+
 # AI Shell
-
-A CLI that converts natural language to shell commands.
-
-![Gif Demo](https://user-images.githubusercontent.com/844291/230413167-773845e7-4c9f-44a5-909c-02802b5e49f6.gif)
-
-Inspired by [Github Copilot X CLI](https://githubnext.com/projects/copilot-cli/), but open source for everyone.
 
 ## Setup
 
@@ -108,9 +126,4 @@ Come join the [Builder.io discord](https://discord.gg/EMx6e58xnw) and chat with 
 <br><br>
 
 
-<p align="center">
-   <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://user-images.githubusercontent.com/844291/230786554-eb225eeb-2f6b-4286-b8c2-535b1131744a.png">
-      <img width="250" alt="Made with love by Builder.io" src="https://user-images.githubusercontent.com/844291/230786555-a58479e4-75f3-4222-a6eb-74c5af953eac.png">
-    </picture>
-</p>
+
