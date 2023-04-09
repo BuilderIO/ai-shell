@@ -4,6 +4,7 @@ import { IncomingMessage } from 'http';
 import { KnownError } from './error';
 import { streamToIterable } from './stream-to-iterable';
 import { detectShell } from './os-detect';
+import { platform } from 'os';
 
 const explainInSecondRequest = true;
 
@@ -191,8 +192,15 @@ const explainScript = dedent`
   If there are multiple steps, please display them as a list.
 `;
 
+function getOsType() {
+  const type = platform();
+  return type === 'darwin' ? 'Mac OS' : type;
+}
+
 const generationDetails = dedent`
   Please only reply with the single line command surrounded by 3 backticks. It should be able to be directly run in a terminal. Do not include any other text.
+
+  Please make sure the script runs on ${getOsType()} operating system.
 `;
 
 // TODO: gather the current OS (Windows, Mac, Linux) and add that to the prompt that it should support this system.
