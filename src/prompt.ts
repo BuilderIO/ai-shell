@@ -68,10 +68,13 @@ async function promptForRevision() {
   return (await group).prompt;
 }
 
-export async function prompt({ usePrompt, silentMode }: { usePrompt?: string, silentMode?: boolean } = {}) {
+export async function prompt({
+  usePrompt,
+  silentMode,
+}: { usePrompt?: string; silentMode?: boolean } = {}) {
   const { OPENAI_KEY: key, SILENT_MODE } = await getConfig();
   const skipCommandExplanation = silentMode || SILENT_MODE;
-  
+
   if (!key) {
     throw new KnownError(
       'Please set your OpenAI API key via `ai-shell config set OPENAI_KEY=<your token>`'
@@ -94,7 +97,7 @@ export async function prompt({ usePrompt, silentMode }: { usePrompt?: string, si
   const script = await readScript(process.stdout.write.bind(process.stdout));
   console.log('');
   console.log('');
-  if(!skipCommandExplanation) {
+  if (!skipCommandExplanation) {
     console.log(dim('•'));
     spin.start(`Getting explanation...`);
     const info = await readInfo(process.stdout.write.bind(process.stdout));
