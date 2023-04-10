@@ -76,9 +76,19 @@ Then you will get an output like this, where you can choose to run the suggested
 └
 ```
 
+### Special characters
+
+Note that some shells handle certain characters like the `?` or `*` or things that look like file paths specially. If you are getting strange behaviors, you can wrap the prompt in quotes to avoid issues, like below:
+
+```bash
+ai 'what is my ip address'
+```
+
+### Silent mode (skip explanations)
+
 You can disable and skip the explanation section by using the flag `-s` or `--silent`
 
-```
+```bash
 ai -s list all log files
 ```
 
@@ -86,14 +96,6 @@ or save the option as a preference using this command:
 
 ```bash
 ai-shell config set SILENT_MODE=true
-```
-
-### Special characters
-
-Note that some shells handle certain characters like the `?` or `*` or things that look like file paths specially. If you are getting strange behaviors, you can wrap the prompt in quotes to avoid issues, like below:
-
-```bash
-ai 'what is my ip address'
 ```
 
 ### Upgrading
