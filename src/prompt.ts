@@ -1,14 +1,14 @@
 import * as p from '@clack/prompts';
-import { bgCyan, black, dim } from 'kolorist';
-import { commandName } from './helpers/constants';
-import { getConfig } from './helpers/config';
-import { KnownError } from './helpers/error';
+import { execaCommand } from 'execa';
+import { cyan, dim } from 'kolorist';
 import {
   getExplanation,
   getRevision,
   getScriptAndInfo,
 } from './helpers/completion';
-import { execaCommand } from 'execa';
+import { getConfig } from './helpers/config';
+import { projectName } from './helpers/constants';
+import { KnownError } from './helpers/error';
 
 const sample = <T>(arr: T[]): T | undefined => {
   const len = arr == null ? 0 : arr.length;
@@ -80,12 +80,12 @@ export async function prompt({ usePrompt, silentMode }: { usePrompt?: string, si
   parseAssert('OPENAI_KEY', key.startsWith('sk-'), 'Must start with "sk-"');
 
   console.log('');
-  p.intro(`${bgCyan(black(` ${commandName} `))}`);
+  p.intro(`${cyan(`${projectName}`)}`);
 
   const thePrompt = usePrompt || (await getPrompt());
   const spin = p.spinner();
   spin.start(`Loading...`);
-  let { readInfo, readScript } = await getScriptAndInfo({
+  const { readInfo, readScript } = await getScriptAndInfo({
     prompt: thePrompt,
     key,
   });
@@ -97,7 +97,7 @@ export async function prompt({ usePrompt, silentMode }: { usePrompt?: string, si
   if(!skipCommandExplanation) {
     console.log(dim('•'));
     spin.start(`Getting explanation...`);
-    let info = await readInfo(process.stdout.write.bind(process.stdout));
+    const info = await readInfo(process.stdout.write.bind(process.stdout));
     if (!info) {
       const { readExplanation } = await getExplanation({ script, key });
       spin.stop(`Explanation:`);
@@ -113,10 +113,14 @@ export async function prompt({ usePrompt, silentMode }: { usePrompt?: string, si
 }
 
 async function runOrReviseFlow(script: string, key: string) {
+  const nonEmptyScript = script.trim() !== '';
+
   const answer = await p.select({
-    message: 'Run this script?',
+    message: nonEmptyScript ? 'Run this script?' : 'Revise this script?',
     options: [
-      { label: '✅ Yes', value: 'yes', hint: 'Lets go!' },
+      ...(nonEmptyScript
+        ? [{ label: '✅ Yes', value: 'yes', hint: 'Lets go!' }]
+        : []),
       {
         label: '📝 Revise',
         value: 'revise',
@@ -138,7 +142,7 @@ async function runOrReviseFlow(script: string, key: string) {
     await execaCommand(script, {
       stdio: 'inherit',
       shell: process.env.SHELL || true,
-    }).catch((err) => {
+    }).catch(() => {
       // Nothing needed, it'll output to stderr
     });
   } else if (cancel) {
@@ -158,16 +162,16 @@ async function revisionFlow(currentScript: string, key: string) {
   });
   spin.stop(`Your new script:`);
 
-  console.log('')
+  console.log('');
   const script = await readScript(process.stdout.write.bind(process.stdout));
   console.log('');
   console.log('');
   console.log(dim('•'));
-  
+
   const infoSpin = p.spinner();
   infoSpin.start(`Getting explanation...`);
   const { readExplanation } = await getExplanation({ script, key });
-  
+
   infoSpin.stop(`Explanation:`);
   console.log('');
   await readExplanation(process.stdout.write.bind(process.stdout));

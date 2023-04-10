@@ -1,7 +1,9 @@
 import { cli } from 'cleye';
+import { red } from 'kolorist';
 import { version } from '../package.json';
 import config from './commands/config';
 import { commandName } from './helpers/constants';
+import { handleCliError } from './helpers/error';
 import { prompt } from './prompt';
 
 cli(
@@ -25,6 +27,10 @@ cli(
   (argv) => {
     const silentMode = argv.flags.silent;
     const promptText = argv._.join(' ');
-    prompt({ usePrompt: promptText, silentMode });
+    prompt({ usePrompt: promptText, silentMode }).catch((error) => {
+      console.error(`\n${red('✖')} ${error.message}`);
+      handleCliError(error);
+      process.exit(1);
+    });
   }
 );
