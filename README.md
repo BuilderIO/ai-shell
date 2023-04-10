@@ -76,11 +76,16 @@ Then you will get an output like this, where you can choose to run the suggested
 └
 ```
 
-you can disable and skip the explanation section by using the flag <b>-s</b> or <b>--silent</b>.
+You can disable and skip the explanation section by using the flag `-s` or `--silent`
+
+```
+ai -s list all log files
+```
+
 or save the option as a preference using this command:
 
 ```bash
-ai-shell config set SILENT_MODE=TRUE
+ai-shell config set SILENT_MODE=true
 ```
 
 ### Special characters

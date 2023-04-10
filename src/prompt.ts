@@ -97,8 +97,8 @@ export async function prompt({
   const script = await readScript(process.stdout.write.bind(process.stdout));
   console.log('');
   console.log('');
+  console.log(dim('•'));
   if (!skipCommandExplanation) {
-    console.log(dim('•'));
     spin.start(`Getting explanation...`);
     const info = await readInfo(process.stdout.write.bind(process.stdout));
     if (!info) {
