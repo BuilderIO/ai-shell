@@ -68,8 +68,10 @@ async function promptForRevision() {
   return (await group).prompt;
 }
 
-export async function prompt({ usePrompt }: { usePrompt?: string } = {}) {
-  const { OPENAI_KEY: key } = await getConfig();
+export async function prompt({ usePrompt, silentMode }: { usePrompt?: string, silentMode?: boolean } = {}) {
+  const { OPENAI_KEY: key, SILENT_MODE } = await getConfig();
+  const skipCommandExplanation = silentMode || SILENT_MODE;
+  
   if (!key) {
     throw new KnownError(
       'Please set your OpenAI API key via `ai-shell config set OPENAI_KEY=<your token>`'
@@ -92,17 +94,19 @@ export async function prompt({ usePrompt }: { usePrompt?: string } = {}) {
   const script = await readScript(process.stdout.write.bind(process.stdout));
   console.log('');
   console.log('');
-  console.log(dim('•'));
-  spin.start(`Getting explanation...`);
-  const info = await readInfo(process.stdout.write.bind(process.stdout));
-  if (!info) {
-    const { readExplanation } = await getExplanation({ script, key });
-    spin.stop(`Explanation:`);
-    console.log('');
-    await readExplanation(process.stdout.write.bind(process.stdout));
-    console.log('');
-    console.log('');
+  if(!skipCommandExplanation) {
     console.log(dim('•'));
+    spin.start(`Getting explanation...`);
+    const info = await readInfo(process.stdout.write.bind(process.stdout));
+    if (!info) {
+      const { readExplanation } = await getExplanation({ script, key });
+      spin.stop(`Explanation:`);
+      console.log('');
+      await readExplanation(process.stdout.write.bind(process.stdout));
+      console.log('');
+      console.log('');
+      console.log(dim('•'));
+    }
   }
 
   await runOrReviseFlow(script, key);
