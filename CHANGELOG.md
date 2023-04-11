@@ -37,3 +37,7 @@ Improve error messaging, again again
 ## 0.1.5
 
 Improve error messaging UX, again x3
+
+## 0.1.6
+
+Silent mode (skip explanation)
