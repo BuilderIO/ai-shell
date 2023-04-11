@@ -145,7 +145,7 @@ async function runOrReviseFlow(script: string, key: string) {
       {
         label: '🔁 Revise',
         value: 'revise',
-        hint: 'Give feedback your prompt and get a new result',
+        hint: 'Give feedback via prompt and get a new result',
       },
       { label: '❌ Cancel', value: 'cancel', hint: 'Exit the program' },
     ],
