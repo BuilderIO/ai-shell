@@ -139,7 +139,7 @@ async function runOrReviseFlow(script: string, key: string) {
         ]
         : []),
       {
-        label: '📝 Revise',
+        label: '🔁 Revise',
         value: 'revise',
         hint: 'Give feedback your prompt and get a new result',
       },
