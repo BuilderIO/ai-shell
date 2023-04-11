@@ -78,7 +78,19 @@ export async function generateCompletion({
     }
 
     const response = error.response;
-    const message = error.response?.data;
+    let message = response?.data as string | object | IncomingMessage;
+    if (response && message instanceof IncomingMessage) {
+      message = await streamToString(
+        response.data as unknown as IncomingMessage
+      );
+      try {
+        // Handle if the message is JSON. It should be but occasionally will
+        // be HTML, so lets handle both
+        message = JSON.parse(message);
+      } catch (e) {
+        // Ignore
+      }
+    }
 
     const messageString = message && JSON.stringify(message, null, 2);
     if (response?.status === 429) {
