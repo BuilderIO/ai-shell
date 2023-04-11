@@ -46,3 +46,7 @@
 
 - Option to edit script before running
 - Fix error with String.prototype.replaceAll not existing
+
+## 0.1.8
+
+- Better error handling (handle streams and non streams, JSON and strings)
