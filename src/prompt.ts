@@ -22,6 +22,17 @@ const examples = [
   'list all commits',
 ];
 
+async function runScript(script: string) {
+  p.outro(`Running: ${script}`);
+  console.log('');
+  await execaCommand(script, {
+    stdio: 'inherit',
+    shell: process.env.SHELL || true,
+  }).catch(() => {
+    // Nothing needed, it'll output to stderr
+  });
+}
+
 async function getPrompt(prompt?: string) {
   const group = p.group(
     {
@@ -122,10 +133,13 @@ async function runOrReviseFlow(script: string, key: string) {
     message: nonEmptyScript ? 'Run this script?' : 'Revise this script?',
     options: [
       ...(nonEmptyScript
-        ? [{ label: '✅ Yes', value: 'yes', hint: 'Lets go!' }]
+        ? [
+          { label: '✅ Yes', value: 'yes', hint: 'Lets go!' },
+          { label: '📝 Edit', value: 'edit', hint: 'Make some adjustments before running' },
+        ]
         : []),
       {
-        label: '📝 Revise',
+        label: '🔁 Revise',
         value: 'revise',
         hint: 'Give feedback your prompt and get a new result',
       },
@@ -136,21 +150,23 @@ async function runOrReviseFlow(script: string, key: string) {
   const confirmed = answer === 'yes';
   const cancel = answer === 'cancel';
   const revisePrompt = answer === 'revise';
+  const edit = answer === 'edit';
 
   if (revisePrompt) {
     await revisionFlow(script, key);
   } else if (confirmed) {
-    p.outro(`Running: ${script}`);
-    console.log('');
-    await execaCommand(script, {
-      stdio: 'inherit',
-      shell: process.env.SHELL || true,
-    }).catch(() => {
-      // Nothing needed, it'll output to stderr
-    });
+    await runScript(script)
   } else if (cancel) {
     p.cancel('Goodbye!');
     process.exit(0);
+  } else if (edit) {
+    const newScript = await p.text({
+      message: 'you can edit script here:',
+      initialValue: script
+    })
+    if(!p.isCancel(newScript)) {
+      await runScript(newScript)
+    }
   }
 }
 
