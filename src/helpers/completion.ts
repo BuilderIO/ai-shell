@@ -232,7 +232,7 @@ const shellDetails = dedent`
 
 const explainScript = dedent`
   Then please describe the script in plain english, step by step, what exactly it does.
-  Please describe succintly, use as few words as possible, do not be verbose. 
+  Please describe succinctly, use as few words as possible, do not be verbose. 
   If there are multiple steps, please display them as a list.
 `;
 
