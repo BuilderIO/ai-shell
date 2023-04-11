@@ -7,6 +7,7 @@ import { detectShell } from './os-detect';
 import { platform } from 'os';
 import type { AxiosError } from 'axios';
 import { streamToString } from './stream-to-string';
+import './replace-all-polyfill';
 
 const explainInSecondRequest = true;
 
