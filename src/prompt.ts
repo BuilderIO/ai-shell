@@ -134,9 +134,13 @@ async function runOrReviseFlow(script: string, key: string) {
     options: [
       ...(nonEmptyScript
         ? [
-          { label: '✅ Yes', value: 'yes', hint: 'Lets go!' },
-          { label: '📝 Edit', value: 'edit', hint: 'Make some adjustments before running' },
-        ]
+            { label: '✅ Yes', value: 'yes', hint: 'Lets go!' },
+            {
+              label: '📝 Edit',
+              value: 'edit',
+              hint: 'Make some adjustments before running',
+            },
+          ]
         : []),
       {
         label: '🔁 Revise',
@@ -155,17 +159,17 @@ async function runOrReviseFlow(script: string, key: string) {
   if (revisePrompt) {
     await revisionFlow(script, key);
   } else if (confirmed) {
-    await runScript(script)
+    await runScript(script);
   } else if (cancel) {
     p.cancel('Goodbye!');
     process.exit(0);
   } else if (edit) {
     const newScript = await p.text({
       message: 'you can edit script here:',
-      initialValue: script
-    })
-    if(!p.isCancel(newScript)) {
-      await runScript(newScript)
+      initialValue: script,
+    });
+    if (!p.isCancel(newScript)) {
+      await runScript(newScript);
     }
   }
 }
