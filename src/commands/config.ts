@@ -11,13 +11,14 @@ import { KnownError, handleCliError } from '../helpers/error.js';
 export default command(
   {
     name: 'config',
-    parameters: ['<mode>', '[key=value...]'],
+    parameters: ['[mode]', '[key=value...]'],
+    description: 'Configure the CLI',
   },
   (argv) => {
     (async () => {
       const { mode, keyValue: keyValues } = argv._;
 
-      if (mode === 'ui') {
+      if (mode === 'ui' || !mode) {
         await showConfigUI();
         return;
       }

@@ -2,6 +2,7 @@ import { cli } from 'cleye';
 import { red } from 'kolorist';
 import { version } from '../package.json';
 import config from './commands/config';
+import update from './commands/update';
 import { commandName } from './helpers/constants';
 import { handleCliError } from './helpers/error';
 import { prompt } from './prompt';
@@ -22,7 +23,7 @@ cli(
         alias: 's',
       },
     },
-    commands: [config],
+    commands: [config, update],
   },
   (argv) => {
     const silentMode = argv.flags.silent;

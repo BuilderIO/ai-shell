@@ -123,10 +123,14 @@ export async function prompt({
     }
   }
 
-  await runOrReviseFlow(script, key);
+  await runOrReviseFlow(script, key, silentMode);
 }
 
-async function runOrReviseFlow(script: string, key: string) {
+async function runOrReviseFlow(
+  script: string,
+  key: string,
+  silentMode?: boolean
+) {
   const nonEmptyScript = script.trim() !== '';
 
   const answer = await p.select({
@@ -157,7 +161,7 @@ async function runOrReviseFlow(script: string, key: string) {
   const edit = answer === 'edit';
 
   if (revisePrompt) {
-    await revisionFlow(script, key);
+    await revisionFlow(script, key, silentMode);
   } else if (confirmed) {
     await runScript(script);
   } else if (cancel) {
@@ -174,7 +178,11 @@ async function runOrReviseFlow(script: string, key: string) {
   }
 }
 
-async function revisionFlow(currentScript: string, key: string) {
+async function revisionFlow(
+  currentScript: string,
+  key: string,
+  silentMode?: boolean
+) {
   const revision = await promptForRevision();
   const spin = p.spinner();
   spin.start(`Loading...`);
@@ -191,18 +199,20 @@ async function revisionFlow(currentScript: string, key: string) {
   console.log('');
   console.log(dim('•'));
 
-  const infoSpin = p.spinner();
-  infoSpin.start(`Getting explanation...`);
-  const { readExplanation } = await getExplanation({ script, key });
+  if (!silentMode) {
+    const infoSpin = p.spinner();
+    infoSpin.start(`Getting explanation...`);
+    const { readExplanation } = await getExplanation({ script, key });
 
-  infoSpin.stop(`Explanation:`);
-  console.log('');
-  await readExplanation(process.stdout.write.bind(process.stdout));
-  console.log('');
-  console.log('');
-  console.log(dim('•'));
+    infoSpin.stop(`Explanation:`);
+    console.log('');
+    await readExplanation(process.stdout.write.bind(process.stdout));
+    console.log('');
+    console.log('');
+    console.log(dim('•'));
+  }
 
-  await runOrReviseFlow(script, key);
+  await runOrReviseFlow(script, key, silentMode);
 }
 
 const parseAssert = (name: string, condition: any, message: string) => {
