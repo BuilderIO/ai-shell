@@ -54,3 +54,7 @@
 ## 0.1.9
 
 - Visual config UI (from `ai config ui`)
+
+## 0.1.10
+
+- Obfuscate API key from config UI
