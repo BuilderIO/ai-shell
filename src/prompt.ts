@@ -83,7 +83,11 @@ export async function prompt({
   usePrompt,
   silentMode,
 }: { usePrompt?: string; silentMode?: boolean } = {}) {
-  const { OPENAI_KEY: key, SILENT_MODE } = await getConfig();
+  const {
+    OPENAI_KEY: key,
+    SILENT_MODE,
+    OPENAI_API_ENDPOINT: apiEndpoint,
+  } = await getConfig();
   const skipCommandExplanation = silentMode || SILENT_MODE;
 
   if (!key) {
@@ -102,6 +106,7 @@ export async function prompt({
   const { readInfo, readScript } = await getScriptAndInfo({
     prompt: thePrompt,
     key,
+    apiEndpoint,
   });
   spin.stop(`Your script:`);
   console.log('');
@@ -113,7 +118,11 @@ export async function prompt({
     spin.start(`Getting explanation...`);
     const info = await readInfo(process.stdout.write.bind(process.stdout));
     if (!info) {
-      const { readExplanation } = await getExplanation({ script, key });
+      const { readExplanation } = await getExplanation({
+        script,
+        key,
+        apiEndpoint,
+      });
       spin.stop(`Explanation:`);
       console.log('');
       await readExplanation(process.stdout.write.bind(process.stdout));
@@ -123,10 +132,10 @@ export async function prompt({
     }
   }
 
-  await runOrReviseFlow(script, key);
+  await runOrReviseFlow(script, key, apiEndpoint);
 }
 
-async function runOrReviseFlow(script: string, key: string) {
+async function runOrReviseFlow(script: string, key: string, apiEndpoint: string) {
   const nonEmptyScript = script.trim() !== '';
 
   const answer = await p.select({
@@ -157,7 +166,7 @@ async function runOrReviseFlow(script: string, key: string) {
   const edit = answer === 'edit';
 
   if (revisePrompt) {
-    await revisionFlow(script, key);
+    await revisionFlow(script, key, apiEndpoint);
   } else if (confirmed) {
     await runScript(script);
   } else if (cancel) {
@@ -174,7 +183,11 @@ async function runOrReviseFlow(script: string, key: string) {
   }
 }
 
-async function revisionFlow(currentScript: string, key: string) {
+async function revisionFlow(
+  currentScript: string,
+  key: string,
+  apiEndpoint: string
+) {
   const revision = await promptForRevision();
   const spin = p.spinner();
   spin.start(`Loading...`);
@@ -182,6 +195,7 @@ async function revisionFlow(currentScript: string, key: string) {
     prompt: revision,
     code: currentScript,
     key,
+    apiEndpoint,
   });
   spin.stop(`Your new script:`);
 
@@ -193,7 +207,11 @@ async function revisionFlow(currentScript: string, key: string) {
 
   const infoSpin = p.spinner();
   infoSpin.start(`Getting explanation...`);
-  const { readExplanation } = await getExplanation({ script, key });
+  const { readExplanation } = await getExplanation({
+    script,
+    key,
+    apiEndpoint,
+  });
 
   infoSpin.stop(`Explanation:`);
   console.log('');
@@ -202,7 +220,7 @@ async function revisionFlow(currentScript: string, key: string) {
   console.log('');
   console.log(dim('•'));
 
-  await runOrReviseFlow(script, key);
+  await runOrReviseFlow(script, key, apiEndpoint);
 }
 
 const parseAssert = (name: string, condition: any, message: string) => {

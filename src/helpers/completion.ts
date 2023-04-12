@@ -11,8 +11,10 @@ import './replace-all-polyfill';
 
 const explainInSecondRequest = true;
 
-function getOpenAi(key: string) {
-  const openAi = new OpenAIApi(new Configuration({ apiKey: key }));
+function getOpenAi(key: string, apiEndpoint: string) {
+  const openAi = new OpenAIApi(
+    new Configuration({ apiKey: key, basePath: apiEndpoint })
+  );
   return openAi;
 }
 
@@ -20,10 +22,12 @@ export async function getScriptAndInfo({
   prompt,
   key,
   model,
+  apiEndpoint,
 }: {
   prompt: string;
   key: string;
   model?: string;
+  apiEndpoint: string;
 }) {
   const fullPrompt = getFullPrompt(prompt);
   const stream = await generateCompletion({
@@ -31,6 +35,7 @@ export async function getScriptAndInfo({
     number: 1,
     key,
     model,
+    apiEndpoint,
   });
   const iterableStream = streamToIterable(stream);
   const codeBlock = '```';
@@ -49,13 +54,15 @@ export async function generateCompletion({
   number = 1,
   key,
   model,
+  apiEndpoint,
 }: {
   prompt: string;
   number?: number;
   model?: string;
   key: string;
+  apiEndpoint: string;
 }) {
-  const openAi = getOpenAi(key);
+  const openAi = getOpenAi(key, apiEndpoint);
   try {
     const completion = await openAi.createChatCompletion(
       {
@@ -100,7 +107,7 @@ export async function generateCompletion({
 
         You can activate billing here: https://platform.openai.com/account/billing/overview . Make sure to add a payment method if not under an active grant from OpenAI.
 
-        Full message from OpenAI: 
+        Full message from OpenAI:
       ` +
           '\n\n' +
           messageString +
@@ -109,7 +116,7 @@ export async function generateCompletion({
     } else if (response && message) {
       throw new KnownError(
         dedent`
-        Request to OpenAI failed with status ${response?.status}: 
+        Request to OpenAI failed with status ${response?.status}:
       ` +
           '\n\n' +
           messageString +
@@ -125,10 +132,12 @@ export async function getExplanation({
   script,
   key,
   model,
+  apiEndpoint,
 }: {
   script: string;
   key: string;
   model?: string;
+  apiEndpoint: string;
 }) {
   const prompt = getExplanationPrompt(script);
   const stream = await generateCompletion({
@@ -136,6 +145,7 @@ export async function getExplanation({
     key,
     number: 1,
     model,
+    apiEndpoint,
   });
   const iterableStream = streamToIterable(stream);
   return { readExplanation: readData(iterableStream, () => true) };
@@ -146,11 +156,13 @@ export async function getRevision({
   code,
   key,
   model,
+  apiEndpoint,
 }: {
   prompt: string;
   code: string;
   key: string;
   model?: string;
+  apiEndpoint: string;
 }) {
   const fullPrompt = getRevisionPrompt(prompt, code);
   const stream = await generateCompletion({
@@ -158,6 +170,7 @@ export async function getRevision({
     key,
     number: 1,
     model,
+    apiEndpoint,
   });
   const iterableStream = streamToIterable(stream);
   return {
@@ -232,7 +245,7 @@ const shellDetails = dedent`
 
 const explainScript = dedent`
   Then please describe the script in plain english, step by step, what exactly it does.
-  Please describe succinctly, use as few words as possible, do not be verbose. 
+  Please describe succinctly, use as few words as possible, do not be verbose.
   If there are multiple steps, please display them as a list.
 `;
 

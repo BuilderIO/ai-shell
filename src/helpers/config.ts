@@ -39,6 +39,9 @@ const configParsers = {
   SILENT_MODE(mode?: string) {
     return String(mode).toLowerCase() === 'true';
   },
+  OPENAI_API_ENDPOINT(apiEndpoint?: string) {
+    return apiEndpoint || 'https://api.openai.com/v1';
+  },
 } as const;
 
 type ConfigKeys = keyof typeof configParsers;
