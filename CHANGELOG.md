@@ -63,3 +63,7 @@
 
 - `ai update` command
 - minor UX improvements and fixes
+
+## 0.1.12
+
+- support custom API endpoints
