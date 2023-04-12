@@ -17,7 +17,7 @@
 <p>
 
 <p align="center">
-   Inspired by the <a href="https://githubnext.com/projects/copilot-cli">Github Copilot X CLI</a>, but open source for everyone.
+   Inspired by the <a href="https://githubnext.com/projects/copilot-cli">GitHub Copilot X CLI</a>, but open source for everyone.
 </p>
 
 <br>
@@ -155,7 +155,7 @@ If you want to help fix a bug or implement a feature in [Issues](https://github.
 
 ## Credit
 
-- Thanks to Github Copilot for their amazing tools and the idea for this
+- Thanks to GitHub Copilot for their amazing tools and the idea for this
 - Thanks to Hassan and his work on [aicommits](https://github.com/Nutlope/aicommits) which inspired the workflow and some parts of the code and flows
 
 ## Community
