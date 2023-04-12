@@ -44,12 +44,6 @@
    ai config set OPENAI_KEY=<your token>
    ```
 
-   And you can custom OpenAI API endpoint to set OPENAI_API_ENDPOINT （default: `https://api.openai.com/v1`）
-
-   ```sh
-   ai-shell config set OPENAI_API_ENDPOINT=<your proxy endpoint>
-   ```
-
    This will create a `.ai-shell` file in your home directory.
 
 ## Usage
@@ -102,6 +96,14 @@ or save the option as a preference using this command:
 
 ```bash
 ai config set SILENT_MODE=true
+```
+
+### Custom API endpoint
+
+You can custom OpenAI API endpoint to set OPENAI_API_ENDPOINT（default: `https://api.openai.com/v1`）
+
+```sh
+ai config set OPENAI_API_ENDPOINT=<your proxy endpoint>
 ```
 
 ### Config UI
