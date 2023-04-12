@@ -108,7 +108,10 @@ export const showConfigUI = async () => {
         {
           label: 'OpenAI Key',
           value: 'OPENAI_KEY',
-          hint: hasOwn(config, 'OPENAI_KEY') ? config.OPENAI_KEY : '(not set)',
+          hint: hasOwn(config, 'OPENAI_KEY')
+            ? // Obfuscate the key
+              'sk-...' + config.OPENAI_KEY.slice(-3)
+            : '(not set)',
         },
         {
           label: 'Silent Mode',
