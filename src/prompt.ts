@@ -132,13 +132,14 @@ export async function prompt({
     }
   }
 
-  await runOrReviseFlow(script, key, apiEndpoint);
+  await runOrReviseFlow(script, key, apiEndpoint, silentMode);
 }
 
 async function runOrReviseFlow(
   script: string,
   key: string,
-  apiEndpoint: string
+  apiEndpoint: string,
+  silentMode?: boolean
 ) {
   const nonEmptyScript = script.trim() !== '';
 
@@ -170,7 +171,7 @@ async function runOrReviseFlow(
   const edit = answer === 'edit';
 
   if (revisePrompt) {
-    await revisionFlow(script, key, apiEndpoint);
+    await revisionFlow(script, key, apiEndpoint, silentMode);
   } else if (confirmed) {
     await runScript(script);
   } else if (cancel) {
@@ -190,7 +191,8 @@ async function runOrReviseFlow(
 async function revisionFlow(
   currentScript: string,
   key: string,
-  apiEndpoint: string
+  apiEndpoint: string,
+  silentMode?: boolean
 ) {
   const revision = await promptForRevision();
   const spin = p.spinner();
@@ -209,22 +211,24 @@ async function revisionFlow(
   console.log('');
   console.log(dim('•'));
 
-  const infoSpin = p.spinner();
-  infoSpin.start(`Getting explanation...`);
-  const { readExplanation } = await getExplanation({
-    script,
-    key,
-    apiEndpoint,
-  });
+  if (!silentMode) {
+    const infoSpin = p.spinner();
+    infoSpin.start(`Getting explanation...`);
+    const { readExplanation } = await getExplanation({
+      script,
+      key,
+      apiEndpoint,
+    });
 
-  infoSpin.stop(`Explanation:`);
-  console.log('');
-  await readExplanation(process.stdout.write.bind(process.stdout));
-  console.log('');
-  console.log('');
-  console.log(dim('•'));
+    infoSpin.stop(`Explanation:`);
+    console.log('');
+    await readExplanation(process.stdout.write.bind(process.stdout));
+    console.log('');
+    console.log('');
+    console.log(dim('•'));
+  }
 
-  await runOrReviseFlow(script, key, apiEndpoint);
+  await runOrReviseFlow(script, key, apiEndpoint, silentMode);
 }
 
 const parseAssert = (name: string, condition: any, message: string) => {

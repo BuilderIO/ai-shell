@@ -58,3 +58,8 @@
 ## 0.1.10
 
 - Obfuscate API key from config UI
+
+## 0.1.11
+
+- `ai update` command
+- minor UX improvements and fixes

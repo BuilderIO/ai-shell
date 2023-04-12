@@ -41,7 +41,7 @@
 3. Set the key so ai-shell can use it:
 
    ```sh
-   ai-shell config set OPENAI_KEY=<your token>
+   ai config set OPENAI_KEY=<your token>
    ```
 
    And you can custom OpenAI API endpoint to set OPENAI_API_ENDPOINT （default: `https://api.openai.com/v1`）
@@ -101,7 +101,7 @@ ai -s list all log files
 or save the option as a preference using this command:
 
 ```bash
-ai-shell config set SILENT_MODE=true
+ai config set SILENT_MODE=true
 ```
 
 ### Config UI
@@ -109,7 +109,7 @@ ai-shell config set SILENT_MODE=true
 To use a more visual interface to view and set config options you can type:
 
 ```bash
-ai config ui
+ai config
 ```
 
 To get an interactive UI like below:
@@ -129,13 +129,19 @@ To get an interactive UI like below:
 Check the installed version with:
 
 ```bash
-ai-shell --version
+ai --version
 ```
 
 If it's not the [latest version](https://github.com/BuilderIO/ai-shell/tags), run:
 
 ```bash
 npm update -g @builder.io/ai-shell
+```
+
+Or just use AI shell:
+
+```bash
+ai update
 ```
 
 ## Common Issues
