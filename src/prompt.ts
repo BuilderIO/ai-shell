@@ -135,7 +135,11 @@ export async function prompt({
   await runOrReviseFlow(script, key, apiEndpoint);
 }
 
-async function runOrReviseFlow(script: string, key: string, apiEndpoint: string) {
+async function runOrReviseFlow(
+  script: string,
+  key: string,
+  apiEndpoint: string
+) {
   const nonEmptyScript = script.trim() !== '';
 
   const answer = await p.select({

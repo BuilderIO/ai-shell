@@ -117,6 +117,13 @@ export const showConfigUI = async () => {
             : '(not set)',
         },
         {
+          label: 'OpenAI API Endpoint',
+          value: 'OPENAI_API_ENDPOINT',
+          hint: hasOwn(config, 'OPENAI_API_ENDPOINT')
+            ? config.OPENAI_API_ENDPOINT
+            : '(not set)',
+        },
+        {
           label: 'Silent Mode',
           value: 'SILENT_MODE',
           hint: hasOwn(config, 'SILENT_MODE')
@@ -147,6 +154,12 @@ export const showConfigUI = async () => {
       });
       if (p.isCancel(key)) return;
       setConfigs([['OPENAI_KEY', key]]);
+    } else if (choice === 'OPENAI_API_ENDPOINT') {
+      const apiEndpoint = await p.text({
+        message: 'Enter your OpenAI API Endpoint',
+      });
+      if (p.isCancel(apiEndpoint)) return;
+      setConfigs([['OPENAI_API_ENDPOINT', apiEndpoint]]);
     } else if (choice === 'SILENT_MODE') {
       const silentMode = await p.confirm({
         message: 'Enable silent mode?',
