@@ -50,3 +50,7 @@
 ## 0.1.8
 
 - Better error handling (handle streams and non streams, JSON and strings)
+
+## 0.1.9
+
+- Visual config UI (from `ai config ui`)

@@ -98,6 +98,25 @@ or save the option as a preference using this command:
 ai-shell config set SILENT_MODE=true
 ```
 
+### Config UI
+
+To use a more visual interface to view and set config options you can type:
+
+```bash
+ai config ui
+```
+
+To get an interactive UI like below:
+
+```bash
+◆  Set config:
+│  ○ OpenAI Key
+│  ○ Silent Mode
+│  ● Model (gpt-3.5-turbo)
+│  ○ Cancel
+└
+```
+
 ### Upgrading
 
 Check the installed version with:
