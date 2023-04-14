@@ -1,7 +1,7 @@
 {
   "name": "@builder.io/ai-shell",
   "description": "A CLI that converts natural language to shell commands.",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "type": "module",
   "dependencies": {
     "@clack/core": "latest",
