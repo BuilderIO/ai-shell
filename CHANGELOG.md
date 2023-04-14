@@ -67,3 +67,7 @@
 ## 0.1.12
 
 - support custom API endpoints
+
+## 0.1.13
+
+- fix for using cloudflare proxy (fix streaming logic to handle partial chunks)
