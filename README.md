@@ -169,7 +169,7 @@ If you want to help fix a bug or implement a feature in [Issues](https://github.
 
 ## Community
 
-Come join the [Builder.io discord](https://discord.gg/EMx6e58xnw) and chat with us in the #ai-shell-general room
+Come join the [Builder.io discord](https://discord.gg/EMx6e58xnw) and chat with us in the #ai-shell room
 
 <br><br>
 
