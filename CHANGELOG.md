@@ -1,79 +1,79 @@
-## 0.0.15
+## 0.1.14
 
-- Stream responses
+- Adds chat mode
+- Fixes "ai update" to not eagerly capture
+- Improve operating system identification
 
-## 0.0.16
+## 0.1.13
 
-- Take the current operating system into account
+- Fix for using cloudflare proxy (fix streaming logic to handle partial chunks)
 
-## 0.0.17
+## 0.1.12
 
-- Minor improvements to the UX of the revision flow
+- Support custom API endpoints
 
-## 0.0.18
+## 0.1.11
 
-- Better error handling
+- `ai update` command
+- Minor UX improvements and fixes
 
-## 0.1.0
+## 0.1.10
 
-- Minor error message improvements
+- Obfuscate API key from config UI
 
-## 0.1.1
+## 0.1.9
 
-- Minor UX improvement ("AI Shell" vs "ai-shell")
+- Visual config UI (from `ai config ui`)
 
-## 0.1.2
+## 0.1.8
 
-- Improve error messaging
-
-## 0.1.3
-
-- Improve error messaging, again
-
-## 0.1.4
-
-- Improve error messaging, again again
-
-## 0.1.5
-
-- Improve error messaging UX, again x3
-
-## 0.1.6
-
-- Silent mode (skip explanation)
+- Better error handling (handle streams and non streams, JSON and strings)
 
 ## 0.1.7
 
 - Option to edit script before running
 - Fix error with String.prototype.replaceAll not existing
 
-## 0.1.8
+## 0.1.6
 
-- Better error handling (handle streams and non streams, JSON and strings)
+- Silent mode (skip explanation)
 
-## 0.1.9
+## 0.1.5
 
-- Visual config UI (from `ai config ui`)
+- Improve error messaging UX, again x3
 
-## 0.1.10
+## 0.1.4
 
-- Obfuscate API key from config UI
+- Improve error messaging, again again
 
-## 0.1.11
+## 0.1.3
 
-- `ai update` command
-- minor UX improvements and fixes
+- Improve error messaging, again
 
-## 0.1.12
+## 0.1.2
 
-- support custom API endpoints
+- Improve error messaging
 
-## 0.1.13
+## 0.1.1
 
-- fix for using cloudflare proxy (fix streaming logic to handle partial chunks)
+- Minor UX improvement ("AI Shell" vs "ai-shell")
 
-## 0.1.14
+## 0.1.0
 
-- adds chat mode
-- fixes "ai update" to not eagerly capture
-- improve operating system identification
+- Minor error message improvements
+
+## 0.0.18
+
+- Better error handling
+
+## 0.0.17
+
+- Minor improvements to the UX of the revision flow
+
+## 0.0.16
+
+- Take the current operating system into account
+
+## 0.0.15
+
+- Stream responses
