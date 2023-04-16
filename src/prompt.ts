@@ -231,7 +231,7 @@ async function revisionFlow(
   await runOrReviseFlow(script, key, apiEndpoint, silentMode);
 }
 
-const parseAssert = (name: string, condition: any, message: string) => {
+export const parseAssert = (name: string, condition: any, message: string) => {
   if (!condition) {
     throw new KnownError(`Invalid config property ${name}: ${message}`);
   }

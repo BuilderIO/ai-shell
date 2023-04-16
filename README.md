@@ -83,6 +83,12 @@ Note that some shells handle certain characters like the `?` or `*` or things th
 ```bash
 ai 'what is my ip address'
 ```
+### chat mode
+```bash
+ai chat
+```
+With this mode, you can engage in a conversation with the AI and receive helpful responses in a natural, conversational manner directly through the CLI.
+
 
 ### Silent mode (skip explanations)
 
