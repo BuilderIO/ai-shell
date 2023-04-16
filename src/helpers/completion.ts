@@ -252,8 +252,8 @@ const explainScript = dedent`
 `;
 
 function getOperationSystemDetails() {
-    const os = require('@nexssp/os/legacy');
-    return os.name()
+  const os = require('@nexssp/os/legacy');
+  return os.name();
 }
 const generationDetails = dedent`
     Only reply with the single line command surrounded by three backticks. It must be able to be directly run in the target shell. Do not include any other text.
@@ -261,7 +261,7 @@ const generationDetails = dedent`
     Make sure the command runs on ${getOperationSystemDetails()} operating system.
   `;
 
-function getFullPrompt(prompt : string) {
+function getFullPrompt(prompt: string) {
   return dedent`
     Create a single line command that one can enter in a terminal and run, based on what is specified in the prompt.
 
