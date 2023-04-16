@@ -5,11 +5,26 @@ import { KnownError } from './error';
 import { streamToIterable } from './stream-to-iterable';
 import { detectShell } from './os-detect';
 import { platform } from 'os';
-import type { AxiosError } from 'axios';
+import globalAxios, { AxiosError } from 'openai/node_modules/axios/index.js';
 import { streamToString } from './stream-to-string';
 import './replace-all-polyfill';
+import httpsProxyAgentPkg from 'https-proxy-agent';
+const { HttpsProxyAgent } = httpsProxyAgentPkg;
 
 const explainInSecondRequest = true;
+
+const httpProxy =
+  process.env.HTTP_PROXY ||
+  process.env.http_proxy ||
+  process.env.HTTPS_PROXY ||
+  process.env.https_proxy;
+
+const proxyAgent = httpProxy && new HttpsProxyAgent(httpProxy);
+
+if (proxyAgent) {
+  globalAxios.defaults.proxy = false;
+  globalAxios.defaults.httpsAgent = proxyAgent;
+}
 
 function getOpenAi(key: string, apiEndpoint: string) {
   const openAi = new OpenAIApi(
