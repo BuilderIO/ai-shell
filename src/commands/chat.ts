@@ -10,14 +10,12 @@ import { streamToIterable } from '../helpers/stream-to-iterable';
 export default command(
   {
     name: 'chat',
-    description: 'start a new chat session to send and receive messages, continue replying until the user chooses to exit.',
+    description:
+      'start a new chat session to send and receive messages, continue replying until the user chooses to exit.',
   },
   async () => {
-
-    const {
-      OPENAI_KEY: key,
-      OPENAI_API_ENDPOINT: apiEndpoint,
-    } = await getConfig();
+    const { OPENAI_KEY: key, OPENAI_API_ENDPOINT: apiEndpoint } =
+      await getConfig();
 
     if (!key) {
       throw new KnownError(
@@ -26,43 +24,41 @@ export default command(
     }
     parseAssert('OPENAI_KEY', key.startsWith('sk-'), 'Must start with "sk-"');
 
-    console.log('')
-    intro("statring new conversation")
+    console.log('');
+    intro('statring new conversation');
     const prompt = async () => {
-    const userPrompt =  await text({
-      message: `${cyan('you')}`,
-      placeholder:`send a message ('exit' to quit)`,
-      validate: (value) => {
-        if (!value) return 'Please enter a prompt.';
+      const userPrompt = (await text({
+        message: `${cyan('you')}`,
+        placeholder: `send a message ('exit' to quit)`,
+        validate: (value) => {
+          if (!value) return 'Please enter a prompt.';
+        },
+      })) as string;
+
+      if (isCancel(userPrompt) || userPrompt === 'exit') {
+        outro('GoodBYE');
+        process.exit(0);
       }
-    }) as string;
 
-    if (isCancel(userPrompt) || userPrompt === 'exit') {
-      outro("GoodBYE");
-      process.exit(0);
-    }
+      const infoSpin = spinner();
+      infoSpin.start(`THINKING...`);
+      const { readResponse } = await getResponse({
+        prompt: userPrompt,
+        key,
+        apiEndpoint,
+      });
 
-    const infoSpin = spinner();
-    infoSpin.start(`THINKING...`);
-    const { readResponse }   = await getResponse({
-      prompt: userPrompt,
-      key,
-      apiEndpoint,
-    });
-
-    infoSpin.stop(`${green('chatgpt')}`);
-    console.log('');
-    await readResponse(process.stdout.write.bind(process.stdout));
-    console.log('');
-    console.log('');
-    prompt();
-    }
+      infoSpin.stop(`${green('chatgpt')}`);
+      console.log('');
+      await readResponse(process.stdout.write.bind(process.stdout));
+      console.log('');
+      console.log('');
+      prompt();
+    };
 
     prompt();
-}
+  }
 );
-
-
 
 async function getResponse({
   prompt,
@@ -76,18 +72,16 @@ async function getResponse({
   model?: string;
   key: string;
   apiEndpoint: string;
-}) {  
+}) {
+  const stream = await generateCompletion({
+    prompt,
+    key,
+    model,
+    number,
+    apiEndpoint,
+  });
 
-const stream = await generateCompletion({
-  prompt,
-  key,
-  model,
-  number,
-  apiEndpoint,
-})
+  const iterableStream = streamToIterable(stream);
 
-const iterableStream = streamToIterable(stream);
-
-return { readResponse: readData(iterableStream, () => true) };
-
+  return { readResponse: readData(iterableStream, () => true) };
 }
