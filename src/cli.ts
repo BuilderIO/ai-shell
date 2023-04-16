@@ -24,15 +24,20 @@ cli(
         alias: 's',
       },
     },
-    commands: [config, update, chat],
+    commands: [config, chat],
   },
   (argv) => {
     const silentMode = argv.flags.silent;
     const promptText = argv._.join(' ');
-    prompt({ usePrompt: promptText, silentMode }).catch((error) => {
-      console.error(`\n${red('✖')} ${error.message}`);
-      handleCliError(error);
-      process.exit(1);
-    });
+
+    if (promptText.trim() === 'update') {
+      update.callback?.(argv);
+    } else {
+      prompt({ usePrompt: promptText, silentMode }).catch((error) => {
+        console.error(`\n${red('✖')} ${error.message}`);
+        handleCliError(error);
+        process.exit(1);
+      });
+    }
   }
 );

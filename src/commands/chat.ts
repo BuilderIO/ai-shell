@@ -25,10 +25,10 @@ export default command(
     parseAssert('OPENAI_KEY', key.startsWith('sk-'), 'Must start with "sk-"');
 
     console.log('');
-    intro('statring new conversation');
+    intro('Starting new conversation');
     const prompt = async () => {
       const userPrompt = (await text({
-        message: `${cyan('you')}`,
+        message: `${cyan('You:')}`,
         placeholder: `send a message ('exit' to quit)`,
         validate: (value) => {
           if (!value) return 'Please enter a prompt.';
@@ -36,7 +36,7 @@ export default command(
       })) as string;
 
       if (isCancel(userPrompt) || userPrompt === 'exit') {
-        outro('GoodBYE');
+        outro('Goodbye!');
         process.exit(0);
       }
 
@@ -48,7 +48,7 @@ export default command(
         apiEndpoint,
       });
 
-      infoSpin.stop(`${green('chatgpt')}`);
+      infoSpin.stop(`${green('AI Shell:')}`);
       console.log('');
       await readResponse(process.stdout.write.bind(process.stdout));
       console.log('');

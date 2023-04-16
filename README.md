@@ -84,13 +84,32 @@ Note that some shells handle certain characters like the `?` or `*` or things th
 ai 'what is my ip address'
 ```
 
-### chat mode
+### Chat mode
 
 ```bash
 ai chat
 ```
 
-With this mode, you can engage in a conversation with the AI and receive helpful responses in a natural, conversational manner directly through the CLI.
+With this mode, you can engage in a conversation with the AI and receive helpful responses in a natural, conversational manner directly through the CLI:
+
+```sh
+┌  Starting new conversation
+│
+◇  You:
+│  how do I serve a redirect in express
+│
+◇  AI Shell:
+
+In Express, you can use the `redirect()` method to serve a redirect. The `redirect()` method takes one argument, which is the URL that you want to redirect to.
+
+Here's an example:
+
+\`\`\`js
+app.get('/oldurl', (req, res) => {
+  res.redirect('/newurl');
+});
+\`\`\`
+```
 
 ### Silent mode (skip explanations)
 
