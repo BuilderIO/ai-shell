@@ -177,7 +177,7 @@ export async function getRevision({
   };
 }
 
-const readData =
+export const readData =
   (
     iterableStream: AsyncGenerator<string, void>,
     startSignal: (content: string) => boolean,

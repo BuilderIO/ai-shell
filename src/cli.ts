@@ -3,6 +3,7 @@ import { red } from 'kolorist';
 import { version } from '../package.json';
 import config from './commands/config';
 import update from './commands/update';
+import chat from './commands/chat';
 import { commandName } from './helpers/constants';
 import { handleCliError } from './helpers/error';
 import { prompt } from './prompt';
@@ -23,7 +24,7 @@ cli(
         alias: 's',
       },
     },
-    commands: [config, update],
+    commands: [config, update, chat],
   },
   (argv) => {
     const silentMode = argv.flags.silent;
