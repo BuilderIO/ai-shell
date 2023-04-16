@@ -71,3 +71,9 @@
 ## 0.1.13
 
 - fix for using cloudflare proxy (fix streaming logic to handle partial chunks)
+
+## 0.1.14
+
+- adds chat mode
+- fixes "ai update" to not eagerly capture
+- improve operating system identification
