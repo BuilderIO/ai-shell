@@ -22,6 +22,8 @@ const examples = [
   'list all commits',
 ];
 
+const clipboardy = require('clipboardy');
+
 async function runScript(script: string) {
   p.outro(`Running: ${script}`);
   console.log('');
@@ -161,6 +163,7 @@ async function runOrReviseFlow(
         value: 'revise',
         hint: 'Give feedback via prompt and get a new result',
       },
+      { label: '📋 Copy', value: 'copy', hint: 'Copy the generated script' },
       { label: '❌ Cancel', value: 'cancel', hint: 'Exit the program' },
     ],
   });
@@ -168,6 +171,7 @@ async function runOrReviseFlow(
   const confirmed = answer === 'yes';
   const cancel = answer === 'cancel';
   const revisePrompt = answer === 'revise';
+  const copy = answer === 'copy';
   const edit = answer === 'edit';
 
   if (revisePrompt) {
@@ -177,6 +181,9 @@ async function runOrReviseFlow(
   } else if (cancel) {
     p.cancel('Goodbye!');
     process.exit(0);
+  } else if (copy) {
+    // copy script to clipboard
+    await clipboardy.write(script);
   } else if (edit) {
     const newScript = await p.text({
       message: 'you can edit script here:',
