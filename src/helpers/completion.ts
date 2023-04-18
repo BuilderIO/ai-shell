@@ -1,4 +1,4 @@
-import { OpenAIApi, Configuration } from 'openai';
+import { OpenAIApi, Configuration, ChatCompletionRequestMessage } from 'openai';
 import dedent from 'dedent';
 import { IncomingMessage } from 'http';
 import { KnownError } from './error';
@@ -55,7 +55,7 @@ export async function generateCompletion({
   model,
   apiEndpoint,
 }: {
-  prompt: string;
+  prompt: string | ChatCompletionRequestMessage[];
   number?: number;
   model?: string;
   key: string;
@@ -66,7 +66,9 @@ export async function generateCompletion({
     const completion = await openAi.createChatCompletion(
       {
         model: model || 'gpt-3.5-turbo',
-        messages: [{ role: 'user', content: prompt }],
+        messages: Array.isArray(prompt)
+          ? prompt
+          : [{ role: 'user', content: prompt }],
         n: Math.min(number, 10),
         stream: true,
       },

@@ -6,6 +6,7 @@ import { parseAssert } from '../prompt';
 import { KnownError } from '../helpers/error';
 import { getConfig } from '../helpers/config';
 import { streamToIterable } from '../helpers/stream-to-iterable';
+import { ChatCompletionRequestMessage } from 'openai';
 
 export default command(
   {
@@ -16,6 +17,8 @@ export default command(
   async () => {
     const { OPENAI_KEY: key, OPENAI_API_ENDPOINT: apiEndpoint } =
       await getConfig();
+
+    const chatHistory: ChatCompletionRequestMessage[] = [];
 
     if (!key) {
       throw new KnownError(
@@ -42,15 +45,25 @@ export default command(
 
       const infoSpin = spinner();
       infoSpin.start(`THINKING...`);
+      chatHistory.push({
+        role: 'user',
+        content: userPrompt,
+      });
       const { readResponse } = await getResponse({
-        prompt: userPrompt,
+        prompt: chatHistory,
         key,
         apiEndpoint,
       });
 
       infoSpin.stop(`${green('AI Shell:')}`);
       console.log('');
-      await readResponse(process.stdout.write.bind(process.stdout));
+      const fullResponse = await readResponse(
+        process.stdout.write.bind(process.stdout)
+      );
+      chatHistory.push({
+        role: 'assistant',
+        content: fullResponse,
+      });
       console.log('');
       console.log('');
       prompt();
@@ -67,7 +80,7 @@ async function getResponse({
   model,
   apiEndpoint,
 }: {
-  prompt: string;
+  prompt: string | ChatCompletionRequestMessage[];
   number?: number;
   model?: string;
   key: string;
