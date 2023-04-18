@@ -1,3 +1,7 @@
+## 0.1.15
+
+- Fix chat mode to support chat history
+
 ## 0.1.14
 
 - Adds chat mode
