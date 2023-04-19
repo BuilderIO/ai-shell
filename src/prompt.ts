@@ -163,7 +163,11 @@ async function runOrReviseFlow(
         value: 'revise',
         hint: 'Give feedback via prompt and get a new result',
       },
-      { label: '📋 Copy', value: 'copy', hint: 'Copy the generated script to your clipboard' },
+      {
+        label: '📋 Copy',
+        value: 'copy',
+        hint: 'Copy the generated script to your clipboard',
+      },
       { label: '❌ Cancel', value: 'cancel', hint: 'Exit the program' },
     ],
   });
