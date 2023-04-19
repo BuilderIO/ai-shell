@@ -186,7 +186,6 @@ async function runOrReviseFlow(
     p.cancel('Goodbye!');
     process.exit(0);
   } else if (copy) {
-    // copy script to clipboard
     await clipboardy.write(script);
   } else if (edit) {
     const newScript = await p.text({
