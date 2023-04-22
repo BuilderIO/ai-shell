@@ -47,3 +47,27 @@ Or in non-UNIX environments, you can use Node.js to run the file:
 ```sh
 node ./dist/cli.mjs
 ```
+
+## Check the lint in order to pass
+
+First, install prettier.
+
+```sh
+npm install -g prettier
+```
+
+Once Prettier is installed, you can run it on a single file or multiple files using the following commands:
+
+1. For a single file:
+
+```sh
+prettier --write path/to/your/file.js
+```
+
+2. For a multiple file:
+
+```sh
+prettier --write "src/**/*.js"
+```
+
+If you use Vscode, It is recommended to use  [prettier-vscode][https://github.com/prettier/prettier-vscode]
