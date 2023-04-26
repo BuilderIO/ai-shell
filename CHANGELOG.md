@@ -1,3 +1,7 @@
+## 0.1.18
+
+- Option to copy the generated script to the clipboard
+
 ## 0.1.15
 
 - Fix chat mode to support chat history
