@@ -148,7 +148,9 @@ export const showConfigUI = async () => {
       const key = await p.text({
         message: 'Enter your OpenAI API key',
         validate: (value) => {
-          if (!value.startsWith('sk-')) return 'Must start with "sk-"';
+          if (value.length) {
+            return 'Please enter a key';
+          }
         },
       });
       if (p.isCancel(key)) return;

@@ -97,7 +97,6 @@ export async function prompt({
       'Please set your OpenAI API key via `ai-shell config set OPENAI_KEY=<your token>`'
     );
   }
-  parseAssert('OPENAI_KEY', key.startsWith('sk-'), 'Must start with "sk-"');
 
   console.log('');
   p.intro(`${cyan(`${projectName}`)}`);
@@ -187,7 +186,7 @@ async function runOrReviseFlow(
     process.exit(0);
   } else if (copy) {
     await clipboardy.write(script);
-    p.outro('Copied to clipboard!');
+    p.outro(cyan('Copied to clipboard!'));
   } else if (edit) {
     const newScript = await p.text({
       message: 'you can edit script here:',

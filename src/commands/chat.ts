@@ -25,7 +25,6 @@ export default command(
         'Please set your OpenAI API key via `ai-shell config set OPENAI_KEY=<your token>`'
       );
     }
-    parseAssert('OPENAI_KEY', key.startsWith('sk-'), 'Must start with "sk-"');
 
     console.log('');
     intro('Starting new conversation');
