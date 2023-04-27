@@ -1,3 +1,7 @@
+## 0.1.19
+
+- Support Azure keys
+
 ## 0.1.18
 
 - Option to copy the generated script to the clipboard
