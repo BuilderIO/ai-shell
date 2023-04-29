@@ -135,6 +135,34 @@ You can custom OpenAI API endpoint to set OPENAI_API_ENDPOINT（default: `https:
 ai config set OPENAI_API_ENDPOINT=<your proxy endpoint>
 ```
 
+### Set Language
+
+The AI Shell's default language is English, but you can easily switch to your preferred language by using the corresponding language keys, as shown below:
+
+| Language    | Key      |
+| ----------- | -------- |
+| English     | en       |
+| Simplified Chinese | zh-Hans |
+| Traditional Chinese | zh-Hant |
+| Spanish     | es       |
+| Japanese    | jp       |
+| Korean      | ko       |
+| French      | fr       |
+| German      | de       |
+| Russian     | ru       |
+| Ukrainian   | uk       |
+| Vietnamese  | vi       |
+| Arabic      | ar       |
+| Portuguese  | pt       |
+
+For instance, if you want to switch to Simplified Chinese, you can do so by setting the LANGUAGE value to zh-Hans:
+
+``` sh
+ai config set LANGUAGE=zh-Hans
+```
+
+This will set your language to Simplified Chinese.
+
 ### Config UI
 
 To use a more visual interface to view and set config options you can type:
@@ -151,6 +179,7 @@ To get an interactive UI like below:
 │  ○ OpenAI API Endpoint
 │  ○ Silent Mode
 │  ● Model (gpt-3.5-turbo)
+│  ○ Language
 │  ○ Cancel
 └
 ```

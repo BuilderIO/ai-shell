@@ -1,5 +1,6 @@
 import os from 'os';
 import path from 'path';
+import i18n from './i18n';
 
 export function detectShell() {
   try {
@@ -11,7 +12,9 @@ export function detectShell() {
     return path.basename(os.userInfo().shell ?? 'bash');
   } catch (err: unknown) {
     if (err instanceof Error) {
-      throw new Error(`Shell detection failed unexpectedly: ${err.message}`);
+      throw new Error(
+        `${i18n.t('Shell detection failed unexpectedly')}: ${err.message}`
+      );
     }
   }
 }
