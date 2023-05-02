@@ -123,7 +123,7 @@ export const showConfigUI = async () => {
           value: 'OPENAI_KEY',
           hint: hasOwn(config, 'OPENAI_KEY')
             ? // Obfuscate the key
-            'sk-...' + config.OPENAI_KEY.slice(-3)
+              'sk-...' + config.OPENAI_KEY.slice(-3)
             : i18n.t('(not set)'),
         },
         {
@@ -192,10 +192,10 @@ export const showConfigUI = async () => {
       if (p.isCancel(model)) return;
       setConfigs([['model', model]]);
     } else if (choice === 'LANGUAGE') {
-      const language = await p.select({
+      const language = (await p.select({
         message: i18n.t('Enter the language you want to use'),
-        options: languagesOptions
-      }) as string;
+        options: languagesOptions,
+      })) as string;
       if (p.isCancel(language)) return;
       setConfigs([['LANGUAGE', language]]);
       i18n.setLanguage(language);

@@ -139,25 +139,25 @@ ai config set OPENAI_API_ENDPOINT=<your proxy endpoint>
 
 The AI Shell's default language is English, but you can easily switch to your preferred language by using the corresponding language keys, as shown below:
 
-| Language    | Key      |
-| ----------- | -------- |
-| English     | en       |
-| Simplified Chinese | zh-Hans |
+| Language            | Key     |
+| ------------------- | ------- |
+| English             | en      |
+| Simplified Chinese  | zh-Hans |
 | Traditional Chinese | zh-Hant |
-| Spanish     | es       |
-| Japanese    | jp       |
-| Korean      | ko       |
-| French      | fr       |
-| German      | de       |
-| Russian     | ru       |
-| Ukrainian   | uk       |
-| Vietnamese  | vi       |
-| Arabic      | ar       |
-| Portuguese  | pt       |
+| Spanish             | es      |
+| Japanese            | jp      |
+| Korean              | ko      |
+| French              | fr      |
+| German              | de      |
+| Russian             | ru      |
+| Ukrainian           | uk      |
+| Vietnamese          | vi      |
+| Arabic              | ar      |
+| Portuguese          | pt      |
 
 For instance, if you want to switch to Simplified Chinese, you can do so by setting the LANGUAGE value to zh-Hans:
 
-``` sh
+```sh
 ai config set LANGUAGE=zh-Hans
 ```
 

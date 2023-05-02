@@ -139,25 +139,25 @@ ai config set OPENAI_API_ENDPOINT=<your proxy endpoint>
 
 AI Shell 的默认语言是英文，但您也可以参考下列语言对应的键，来设置您需要的语言界面：
 
-| 语言       | 键值     |
+| 语言       | 键值    |
 | ---------- | ------- |
 | English    | en      |
-| 简体中文    | zh-Hans |
-| 繁体中文    | zh-Hant |
+| 简体中文   | zh-Hans |
+| 繁体中文   | zh-Hant |
 | Español    | es      |
-| 日本語      | jp      |
-| 한국어      | ko      |
+| 日本語     | jp      |
+| 한국어     | ko      |
 | Français   | fr      |
-| Deutsch    | de     |
-| Русский    | ru     |
-| Українська | uk    |
-| Tiếng Việt | vi    |
-| العربية    | ar    |
-| Português  | pt    |
+| Deutsch    | de      |
+| Русский    | ru      |
+| Українська | uk      |
+| Tiếng Việt | vi      |
+| العربية    | ar      |
+| Português  | pt      |
 
 例如，您要将语言设置为简体中文，可以在设置 LANGUAGE 的值为 zh-Hans:
 
-``` sh
+```sh
 ai config set LANGUAGE=zh-Hans
 ```
 

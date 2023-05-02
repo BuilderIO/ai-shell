@@ -12,23 +12,22 @@ import viTranslation from '../locales/vi.json';
 import arTranslation from '../locales/ar.json';
 import ptTranslation from '../locales/pt.json';
 
-
 let currentlang: string = 'en';
 
 const languages: Record<string, string> = {
-  'en': 'English',
+  en: 'English',
   'zh-Hans': '简体中文', // simplified Chinese
   'zh-Hant': '繁體中文', // traditional Chinese
-  'es': 'Español', // Spanish
-  'jp': '日本語', // Japanese
-  'ko': '한국어',// Korean
-  'fr': 'Français',// French
-  'de': 'Deutsch',// German
-  'ru': 'Русский',// Russian
-  'uk': 'Українська',// Ukrainian
-  'vi': 'Tiếng Việt',// Vietnamese
-  'ar': 'العربية',// Arabic
-  'pt': 'Português',// Portuguese
+  es: 'Español', // Spanish
+  jp: '日本語', // Japanese
+  ko: '한국어', // Korean
+  fr: 'Français', // French
+  de: 'Deutsch', // German
+  ru: 'Русский', // Russian
+  uk: 'Українська', // Ukrainian
+  vi: 'Tiếng Việt', // Vietnamese
+  ar: 'العربية', // Arabic
+  pt: 'Português', // Portuguese
 };
 
 i18next.init({
@@ -41,34 +40,34 @@ i18next.init({
     'zh-Hant': {
       translation: zhHantTranslation,
     },
-    'es': {
+    es: {
       translation: esTranslation,
     },
-    'jp': {
+    jp: {
       translation: jpTranslation,
     },
-    'ko': {
+    ko: {
       translation: koTranslation,
     },
-    'fr': {
+    fr: {
       translation: frTranslation,
     },
-    'de': {
+    de: {
       translation: deTranslation,
     },
-    'ru': {
+    ru: {
       translation: ruTranslation,
     },
-    'uk': {
+    uk: {
       translation: ukTranslation,
     },
-    'vi': {
+    vi: {
       translation: viTranslation,
     },
-    'ar': {
+    ar: {
       translation: arTranslation,
     },
-    'pt': {
+    pt: {
       translation: ptTranslation,
     },
   },
