@@ -7,6 +7,7 @@ import {
   showConfigUI,
 } from '../helpers/config.js';
 import { KnownError, handleCliError } from '../helpers/error.js';
+import i18n from '../helpers/i18n.js';
 
 export default command(
   {
@@ -24,7 +25,11 @@ export default command(
       }
 
       if (!keyValues.length) {
-        console.error('Error: Missing required parameter "key=value"\n');
+        console.error(
+          `${i18n.t('Error')}: ${i18n.t(
+            'Missing required parameter'
+          )} "key=value"\n`
+        );
         argv.showHelp();
         return process.exit(1);
       }
@@ -46,7 +51,7 @@ export default command(
         return;
       }
 
-      throw new KnownError(`Invalid mode: ${mode}`);
+      throw new KnownError(`${i18n.t('Invalid mode')}: ${mode}`);
     })().catch((error) => {
       console.error(`\n${red('✖')} ${error.message}`);
       handleCliError(error);

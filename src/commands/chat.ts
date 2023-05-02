@@ -7,6 +7,7 @@ import { KnownError } from '../helpers/error';
 import { getConfig } from '../helpers/config';
 import { streamToIterable } from '../helpers/stream-to-iterable';
 import { ChatCompletionRequestMessage } from 'openai';
+import i18n from '../helpers/i18n';
 
 export default command(
   {
@@ -17,33 +18,35 @@ export default command(
   async () => {
     const { OPENAI_KEY: key, OPENAI_API_ENDPOINT: apiEndpoint } =
       await getConfig();
-
     const chatHistory: ChatCompletionRequestMessage[] = [];
 
     if (!key) {
       throw new KnownError(
-        'Please set your OpenAI API key via `ai-shell config set OPENAI_KEY=<your token>`'
+        i18n.t(
+          'Please set your OpenAI API key via `ai-shell config set OPENAI_KEY=<your token>`'
+        )
       );
     }
 
     console.log('');
-    intro('Starting new conversation');
+    intro(i18n.t('Starting new conversation'));
     const prompt = async () => {
+      let msgYou = `${i18n.t('You')}:`;
       const userPrompt = (await text({
-        message: `${cyan('You:')}`,
-        placeholder: `send a message ('exit' to quit)`,
+        message: `${cyan(msgYou)}`,
+        placeholder: i18n.t(`send a message ('exit' to quit)`),
         validate: (value) => {
-          if (!value) return 'Please enter a prompt.';
+          if (!value) return i18n.t('Please enter a prompt.');
         },
       })) as string;
 
       if (isCancel(userPrompt) || userPrompt === 'exit') {
-        outro('Goodbye!');
+        outro(i18n.t('Goodbye!'));
         process.exit(0);
       }
 
       const infoSpin = spinner();
-      infoSpin.start(`THINKING...`);
+      infoSpin.start(i18n.t(`THINKING...`));
       chatHistory.push({
         role: 'user',
         content: userPrompt,
