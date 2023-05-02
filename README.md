@@ -137,6 +137,8 @@ ai config set OPENAI_API_ENDPOINT=<your proxy endpoint>
 
 ### Set Language
 
+![Language UI](https://user-images.githubusercontent.com/1784873/235330029-0a3b394c-d797-41d6-8717-9a6b487f1ae8.gif)
+
 The AI Shell's default language is English, but you can easily switch to your preferred language by using the corresponding language keys, as shown below:
 
 | Language            | Key     |
