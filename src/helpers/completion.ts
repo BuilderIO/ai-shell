@@ -7,6 +7,7 @@ import { detectShell } from './os-detect';
 import type { AxiosError } from 'axios';
 import { streamToString } from './stream-to-string';
 import './replace-all-polyfill';
+import i18n from './i18n';
 
 const explainInSecondRequest = true;
 
@@ -234,7 +235,7 @@ export const readData =
 
 function getExplanationPrompt(script: string) {
   return dedent`
-    ${explainScript}
+    ${explainScript} Please reply in ${i18n.getCurrentLanguagenName()}
 
     The script: ${script}
   `;

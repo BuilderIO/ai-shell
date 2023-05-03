@@ -7,14 +7,22 @@ import { commandName } from './constants';
 import { KnownError, handleCliError } from './error';
 import * as p from '@clack/prompts';
 import { red } from 'kolorist';
+import i18n from './i18n';
 
 const { hasOwnProperty } = Object.prototype;
 export const hasOwn = (object: unknown, key: PropertyKey) =>
   hasOwnProperty.call(object, key);
 
+const languagesOptions = Object.entries(i18n.languages).map(([key, value]) => ({
+  value: key,
+  label: value,
+}));
+
 const parseAssert = (name: string, condition: any, message: string) => {
   if (!condition) {
-    throw new KnownError(`Invalid config property ${name}: ${message}`);
+    throw new KnownError(
+      `${i18n.t('Invalid config property')} ${name}: ${message}`
+    );
   }
 };
 
@@ -22,7 +30,7 @@ const configParsers = {
   OPENAI_KEY(key?: string) {
     if (!key) {
       throw new KnownError(
-        `Please set your OpenAI API key via \`${commandName} config set OPENAI_KEY=<your token>\``
+        `Please set your OpenAI API key via \`${commandName} config set OPENAI_KEY=<your token>\`` // TODO: i18n
       );
     }
 
@@ -40,6 +48,9 @@ const configParsers = {
   },
   OPENAI_API_ENDPOINT(apiEndpoint?: string) {
     return apiEndpoint || 'https://api.openai.com/v1';
+  },
+  LANGUAGE(language?: string) {
+    return language || 'en';
   },
 } as const;
 
@@ -91,7 +102,7 @@ export const setConfigs = async (keyValues: [key: string, value: string][]) => {
 
   for (const [key, value] of keyValues) {
     if (!hasOwn(configParsers, key)) {
-      throw new KnownError(`Invalid config property: ${key}`);
+      throw new KnownError(`${i18n.t('Invalid config property')}: ${key}`);
     }
 
     const parsed = configParsers[key as ConfigKeys](value);
@@ -105,39 +116,46 @@ export const showConfigUI = async () => {
   try {
     const config = await getConfig();
     const choice = (await p.select({
-      message: 'Set config:',
+      message: i18n.t('Set config') + ':',
       options: [
         {
-          label: 'OpenAI Key',
+          label: i18n.t('OpenAI Key'),
           value: 'OPENAI_KEY',
           hint: hasOwn(config, 'OPENAI_KEY')
             ? // Obfuscate the key
               'sk-...' + config.OPENAI_KEY.slice(-3)
-            : '(not set)',
+            : i18n.t('(not set)'),
         },
         {
-          label: 'OpenAI API Endpoint',
+          label: i18n.t('OpenAI API Endpoint'),
           value: 'OPENAI_API_ENDPOINT',
           hint: hasOwn(config, 'OPENAI_API_ENDPOINT')
             ? config.OPENAI_API_ENDPOINT
-            : '(not set)',
+            : i18n.t('(not set)'),
         },
         {
-          label: 'Silent Mode',
+          label: i18n.t('Silent Mode'),
           value: 'SILENT_MODE',
           hint: hasOwn(config, 'SILENT_MODE')
             ? config.SILENT_MODE.toString()
-            : '(not set)',
+            : i18n.t('(not set)'),
         },
         {
-          label: 'Model',
+          label: i18n.t('Model'),
           value: 'model',
-          hint: hasOwn(config, 'model') ? config.model : '(not set)',
+          hint: hasOwn(config, 'model') ? config.model : i18n.t('(not set)'),
         },
         {
-          label: 'Cancel',
+          label: i18n.t('Language'),
+          value: 'LANGUAGE',
+          hint: hasOwn(config, 'LANGUAGE')
+            ? config.LANGUAGE
+            : i18n.t('(not set)'),
+        },
+        {
+          label: i18n.t('Cancel'),
           value: 'cancel',
-          hint: 'Exit the program',
+          hint: i18n.t('Exit the program'),
         },
       ],
     })) as ConfigKeys | 'cancel' | symbol;
@@ -146,10 +164,10 @@ export const showConfigUI = async () => {
 
     if (choice === 'OPENAI_KEY') {
       const key = await p.text({
-        message: 'Enter your OpenAI API key',
+        message: i18n.t('Enter your OpenAI API key'),
         validate: (value) => {
-          if (value.length) {
-            return 'Please enter a key';
+          if (!value.length) {
+            return i18n.t('Please enter a key');
           }
         },
       });
@@ -157,22 +175,30 @@ export const showConfigUI = async () => {
       setConfigs([['OPENAI_KEY', key]]);
     } else if (choice === 'OPENAI_API_ENDPOINT') {
       const apiEndpoint = await p.text({
-        message: 'Enter your OpenAI API Endpoint',
+        message: i18n.t('Enter your OpenAI API Endpoint'),
       });
       if (p.isCancel(apiEndpoint)) return;
       setConfigs([['OPENAI_API_ENDPOINT', apiEndpoint]]);
     } else if (choice === 'SILENT_MODE') {
       const silentMode = await p.confirm({
-        message: 'Enable silent mode?',
+        message: i18n.t('Enable silent mode?'),
       });
       if (p.isCancel(silentMode)) return;
       setConfigs([['SILENT_MODE', silentMode ? 'true' : 'false']]);
     } else if (choice === 'model') {
       const model = await p.text({
-        message: 'Enter the model you want to use',
+        message: i18n.t('Enter the model you want to use'),
       });
       if (p.isCancel(model)) return;
       setConfigs([['model', model]]);
+    } else if (choice === 'LANGUAGE') {
+      const language = (await p.select({
+        message: i18n.t('Enter the language you want to use'),
+        options: languagesOptions,
+      })) as string;
+      if (p.isCancel(language)) return;
+      setConfigs([['LANGUAGE', language]]);
+      i18n.setLanguage(language);
     }
     if (choice === 'cancel') return;
     showConfigUI();

@@ -1,7 +1,7 @@
 {
   "name": "@builder.io/ai-shell",
   "description": "A CLI that converts natural language to shell commands.",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "type": "module",
   "dependencies": {
     "@clack/core": "latest",
@@ -13,6 +13,7 @@
     "clipboardy": "^2.3.0",
     "dedent": "^0.7.0",
     "execa": "^7.1.1",
+    "i18next": "^22.4.15",
     "ini": "^4.0.0",
     "kolorist": "^1.7.0",
     "openai": "^3.2.1"
