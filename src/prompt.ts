@@ -142,59 +142,63 @@ async function runOrReviseFlow(
   apiEndpoint: string,
   silentMode?: boolean
 ) {
-  const nonEmptyScript = script.trim() !== '';
+  const EmptyScript = script.trim() === '';
 
-  const answer = await p.select({
-    message: nonEmptyScript ? 'Run this script?' : 'Revise this script?',
+  const answer: symbol | (() => any) = await p.select({
+    message: EmptyScript ? 'Revise this script?' : 'Run this script?',
     options: [
-      ...(nonEmptyScript
-        ? [
-            { label: '✅ Yes', value: 'yes', hint: 'Lets go!' },
+      ...(EmptyScript
+        ? []
+        : [
+            {
+              label: '✅ Yes',
+              hint: 'Lets go!',
+              value: async () => {
+                await runScript(script);
+              },
+            },
             {
               label: '📝 Edit',
-              value: 'edit',
               hint: 'Make some adjustments before running',
+              value: async () => {
+                const newScript = await p.text({
+                  message: 'you can edit script here:',
+                  initialValue: script,
+                });
+                if (!p.isCancel(newScript)) {
+                  await runScript(newScript);
+                }
+              },
             },
-          ]
-        : []),
+          ]),
       {
         label: '🔁 Revise',
-        value: 'revise',
         hint: 'Give feedback via prompt and get a new result',
+        value: async () => {
+          await revisionFlow(script, key, apiEndpoint, silentMode);
+        },
       },
       {
         label: '📋 Copy',
-        value: 'copy',
         hint: 'Copy the generated script to your clipboard',
+        value: async () => {
+          await clipboardy.write(script);
+          p.outro('Copied to clipboard!');
+        },
       },
-      { label: '❌ Cancel', value: 'cancel', hint: 'Exit the program' },
+      {
+        label: '❌ Cancel',
+        hint: 'Exit the program',
+        value: () => {
+          p.cancel('Goodbye!');
+          process.exit(0);
+        },
+      },
     ],
   });
 
-  const confirmed = answer === 'yes';
-  const cancel = answer === 'cancel';
-  const revisePrompt = answer === 'revise';
-  const copy = answer === 'copy';
-  const edit = answer === 'edit';
-
-  if (revisePrompt) {
-    await revisionFlow(script, key, apiEndpoint, silentMode);
-  } else if (confirmed) {
-    await runScript(script);
-  } else if (cancel) {
-    p.cancel('Goodbye!');
-    process.exit(0);
-  } else if (copy) {
-    await clipboardy.write(script);
-    p.outro(cyan('Copied to clipboard!'));
-  } else if (edit) {
-    const newScript = await p.text({
-      message: 'you can edit script here:',
-      initialValue: script,
-    });
-    if (!p.isCancel(newScript)) {
-      await runScript(newScript);
-    }
+  if (typeof answer === 'function') {
+    await answer();
   }
 }
 
