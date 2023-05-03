@@ -9,6 +9,7 @@ import {
 import { getConfig } from './helpers/config';
 import { projectName } from './helpers/constants';
 import { KnownError } from './helpers/error';
+import clipboardy from 'clipboardy'
 
 const sample = <T>(arr: T[]): T | undefined => {
   const len = arr == null ? 0 : arr.length;
@@ -22,7 +23,6 @@ const examples = [
   'list all commits',
 ];
 
-const clipboardy = require('clipboardy');
 
 async function runScript(script: string) {
   p.outro(`Running: ${script}`);
