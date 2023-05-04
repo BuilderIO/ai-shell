@@ -55,7 +55,7 @@ ai <prompt>
 例如：
 
 ```bash
-ai 列出所有日志文件
+ai 查找所有.log文件
 ```
 
 然后您将会得到如下输出，您可以选择运行建议的命令、通过提示修改命令或者取消：
@@ -67,7 +67,9 @@ ai 列出所有日志文件
 │
 ◇  解释:
 │
-│  1. 在当前目录及其子目录中搜索所有扩展名为“.log”的文件。
+│  这个脚本的步骤如下：
+│  1. 在当前目录下搜索所有后缀为".log"的文件。
+│  2. 输出所有找到的文件的路径。
 │
 ◆  运行这个脚本?
 │  ● ✅ 是 (开始运行吧！)
@@ -84,7 +86,7 @@ ai 列出所有日志文件
 ai '我的 IP 地址是什么？'
 ```
 
-### Chat mode
+### 聊天模式
 
 ![Chat demo](https://user-images.githubusercontent.com/844291/232889699-e13fb3fe-1659-4583-80ee-6c58d1bcbd06.gif)
 
@@ -136,6 +138,8 @@ ai config set OPENAI_API_ENDPOINT=<your proxy endpoint>
 ```
 
 ### 设置语言
+
+![Language UI](https://user-images.githubusercontent.com/1784873/235330029-0a3b394c-d797-41d6-8717-9a6b487f1ae8.gif)
 
 AI Shell 的默认语言是英文，但您也可以参考下列语言对应的键，来设置您需要的语言界面：
 
