@@ -155,7 +155,7 @@ async function runOrReviseFlow(
   const emptyScript = script.trim() === '';
 
   const answer: symbol | (() => any) = await p.select({
-    message: EmptyScript
+    message: emptyScript
       ? i18n.t('Revise this script?')
       : i18n.t('Run this script?'),
     options: [
