@@ -152,7 +152,7 @@ async function runOrReviseFlow(
   apiEndpoint: string,
   silentMode?: boolean
 ) {
-  const EmptyScript = script.trim() === '';
+  const emptyScript = script.trim() === '';
 
   const answer: symbol | (() => any) = await p.select({
     message: EmptyScript
