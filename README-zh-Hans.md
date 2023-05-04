@@ -84,7 +84,7 @@ ai 列出所有日志文件
 ai '我的 IP 地址是什么？'
 ```
 
-### Chat mode
+### 聊天模式
 
 ![Chat demo](https://user-images.githubusercontent.com/844291/232889699-e13fb3fe-1659-4583-80ee-6c58d1bcbd06.gif)
 
@@ -136,6 +136,8 @@ ai config set OPENAI_API_ENDPOINT=<your proxy endpoint>
 ```
 
 ### 设置语言
+
+![Language UI](https://user-images.githubusercontent.com/1784873/235330029-0a3b394c-d797-41d6-8717-9a6b487f1ae8.gif)
 
 AI Shell 的默认语言是英文，但您也可以参考下列语言对应的键，来设置您需要的语言界面：
 
