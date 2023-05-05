@@ -4,7 +4,7 @@
   "send a message ('exit' to quit)": "أرسل رسالة ('exit' للخروج)",
   "Please enter a prompt.": "الرجاء إدخال تعليمات.",
   "THINKING...": "فكر...",
-  "Please set your OpenAI API key via `ai-shell config set OPENAI_KEY=<your token>`": "يرجى تعيين مفتاح OpenAI API الخاص بك عبر `ai-shell config set OPENAI_KEY=<your token>`",
+  "Please set your OpenAI API key via `ai config set OPENAI_KEY=<your token>`": "يرجى تعيين مفتاح OpenAI API الخاص بك عبر `ai config set OPENAI_KEY=<your token>`",
   "Set config": "تعيين التكوين",
   "Enter your OpenAI API key": "أدخل مفتاح OpenAI API الخاص بك",
   "(not set)": "(غير مضبوط)",

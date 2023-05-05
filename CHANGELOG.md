@@ -1,3 +1,7 @@
+## 0.1.21
+
+- Fix a bug preventing initial configuration
+
 ## 0.1.20
 
 - Multi language support [#62](https://github.com/BuilderIO/ai-shell/pull/62)

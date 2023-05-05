@@ -9,6 +9,7 @@ import {
 import { getConfig } from './helpers/config';
 import { projectName } from './helpers/constants';
 import { KnownError } from './helpers/error';
+import clipboardy from 'clipboardy';
 import i18n from './helpers/i18n';
 
 const init = async () => {
@@ -32,8 +33,6 @@ const sample = <T>(arr: T[]): T | undefined => {
   const len = arr == null ? 0 : arr.length;
   return len ? arr[Math.floor(Math.random() * len)] : undefined;
 };
-
-const clipboardy = require('clipboardy');
 
 async function runScript(script: string) {
   p.outro(`${i18n.t('Running')}: ${script}`);
@@ -108,7 +107,7 @@ export async function prompt({
   if (!key) {
     throw new KnownError(
       i18n.t(
-        'Please set your OpenAI API key via `ai-shell config set OPENAI_KEY=<your token>`'
+        'Please set your OpenAI API key via `ai config set OPENAI_KEY=<your token>`'
       )
     );
   }
@@ -157,69 +156,65 @@ async function runOrReviseFlow(
   apiEndpoint: string,
   silentMode?: boolean
 ) {
-  const nonEmptyScript = script.trim() !== '';
+  const emptyScript = script.trim() === '';
 
-  const answer = await p.select({
-    message: nonEmptyScript
-      ? i18n.t('Run this script?')
-      : i18n.t('Revise this script?'),
+  const answer: symbol | (() => any) = await p.select({
+    message: emptyScript
+      ? i18n.t('Revise this script?')
+      : i18n.t('Run this script?'),
     options: [
-      ...(nonEmptyScript
-        ? [
+      ...(emptyScript
+        ? []
+        : [
             {
               label: '✅ ' + i18n.t('Yes'),
-              value: 'yes',
               hint: i18n.t('Lets go!'),
+              value: async () => {
+                await runScript(script);
+              },
             },
             {
               label: '📝 ' + i18n.t('Edit'),
-              value: 'edit',
               hint: i18n.t('Make some adjustments before running'),
+              value: async () => {
+                const newScript = await p.text({
+                  message: i18n.t('you can edit script here:'),
+                  initialValue: script,
+                });
+                if (!p.isCancel(newScript)) {
+                  await runScript(newScript);
+                }
+              },
             },
-          ]
-        : []),
+          ]),
       {
         label: '🔁 ' + i18n.t('Revise'),
-        value: 'revise',
         hint: i18n.t('Give feedback via prompt and get a new result'),
+        value: async () => {
+          await revisionFlow(script, key, apiEndpoint, silentMode);
+        },
       },
       {
         label: '📋 ' + i18n.t('Copy'),
-        value: 'copy',
         hint: i18n.t('Copy the generated script to your clipboard'),
+        value: async () => {
+          await clipboardy.write(script);
+          p.outro(i18n.t('Copied to clipboard!'));
+        },
       },
       {
         label: '❌ ' + i18n.t('Cancel'),
-        value: 'cancel',
         hint: i18n.t('Exit the program'),
+        value: () => {
+          p.cancel(i18n.t('Goodbye!'));
+          process.exit(0);
+        },
       },
     ],
   });
 
-  const confirmed = answer === 'yes';
-  const cancel = answer === 'cancel';
-  const revisePrompt = answer === 'revise';
-  const copy = answer === 'copy';
-  const edit = answer === 'edit';
-
-  if (revisePrompt) {
-    await revisionFlow(script, key, apiEndpoint, silentMode);
-  } else if (confirmed) {
-    await runScript(script);
-  } else if (cancel) {
-    p.cancel(i18n.t('Goodbye!'));
-    process.exit(0);
-  } else if (copy) {
-    await clipboardy.write(script);
-    p.outro(cyan(i18n.t('Copied to clipboard!')));
-  } else if (edit) {
-    const newScript = await p.text({
-      message: i18n.t('you can edit script here') + ':',
-      initialValue: script,
-    });
-    if (!p.isCancel(newScript)) {
-      await runScript(newScript);
-    }
+  if (typeof answer === 'function') {
+    await answer();
   }
 }
 

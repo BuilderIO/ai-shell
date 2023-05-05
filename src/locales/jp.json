@@ -4,7 +4,7 @@
   "send a message ('exit' to quit)": "メッセージを送信する（終了するには 'exit'）",
   "Please enter a prompt.": "プロンプトを入力してください。",
   "THINKING...": "考え中...",
-  "Please set your OpenAI API key via `ai-shell config set OPENAI_KEY=<your token>`": "OpenAI APIキーを `ai-shell config set OPENAI_KEY=<your token>` で設定してください",
+  "Please set your OpenAI API key via `ai config set OPENAI_KEY=<your token>`": "OpenAI APIキーを `ai config set OPENAI_KEY=<your token>` で設定してください",
   "Set config": "設定",
   "Enter your OpenAI API key": "OpenAI APIキーを入力してください",
   "(not set)": "(未設定)",

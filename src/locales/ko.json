@@ -4,7 +4,7 @@
   "send a message ('exit' to quit)": "메시지 보내기 ('exit' 입력 시 종료)",
   "Please enter a prompt.": "프롬프트를 입력하세요.",
   "THINKING...": "생각 중...",
-  "Please set your OpenAI API key via `ai-shell config set OPENAI_KEY=<your token>`": "OpenAI API 키를 `ai-shell config set OPENAI_KEY=<your token>`으로 설정하세요.",
+  "Please set your OpenAI API key via `ai config set OPENAI_KEY=<your token>`": "OpenAI API 키를 `ai config set OPENAI_KEY=<your token>`으로 설정하세요.",
   "Set config": "설정",
   "Enter your OpenAI API key": "OpenAI API 키를 입력하세요.",
   "(not set)": "(설정되지 않음)",
