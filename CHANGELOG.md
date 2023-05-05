@@ -1,6 +1,10 @@
 ## 0.1.21
 
-- Fix a bug preventing initial configuration
+- Fix a crash on linux [#64](https://github.com/BuilderIO/ai-shell/issues/64)
+
+## 0.1.21
+
+- Fix a bug preventing initial configuration [#69](https://github.com/BuilderIO/ai-shell/issues/69)
 
 ## 0.1.20
 
