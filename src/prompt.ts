@@ -159,7 +159,7 @@ async function runOrReviseFlow(
       ? i18n.t('Revise this script?')
       : i18n.t('Run this script?'),
     options: [
-      ...(EmptyScript
+      ...(emptyScript
         ? []
         : [
             {
