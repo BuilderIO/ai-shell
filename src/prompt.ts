@@ -107,7 +107,7 @@ export async function prompt({
   if (!key) {
     throw new KnownError(
       i18n.t(
-        'Please set your OpenAI API key via `ai-shell config set OPENAI_KEY=<your token>`'
+        'Please set your OpenAI API key via `ai config set OPENAI_KEY=<your token>`'
       )
     );
   }

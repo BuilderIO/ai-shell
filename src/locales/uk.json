@@ -4,7 +4,7 @@
   "send a message ('exit' to quit)": "надіслати повідомлення ('вихід', щоб вийти)",
   "Please enter a prompt.": "Будь ласка, введіть запитання.",
   "THINKING...": "ДУМАЮ...",
-  "Please set your OpenAI API key via `ai-shell config set OPENAI_KEY=<your token>`": "Будь ласка, встановіть свій ключ OpenAI API через `ai-shell config set OPENAI_KEY=<your token>`",
+  "Please set your OpenAI API key via `ai config set OPENAI_KEY=<your token>`": "Будь ласка, встановіть свій ключ OpenAI API через `ai config set OPENAI_KEY=<your token>`",
   "Set config": "Встановити конфігурацію",
   "Enter your OpenAI API key": "Введіть свій ключ OpenAI API",
   "(not set)": "(не встановлено)",

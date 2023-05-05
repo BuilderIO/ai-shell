@@ -4,7 +4,7 @@
   "send a message ('exit' to quit)": "gửi tin nhắn ('exit' để thoát)",
   "Please enter a prompt.": "Vui lòng nhập một lời nhắn.",
   "THINKING...": "ĐANG SUY NGHĨ...",
-  "Please set your OpenAI API key via `ai-shell config set OPENAI_KEY=<your token>`": "Vui lòng thiết lập khóa API OpenAI của bạn thông qua `ai-shell config set OPENAI_KEY=<your token>`",
+  "Please set your OpenAI API key via `ai config set OPENAI_KEY=<your token>`": "Vui lòng thiết lập khóa API OpenAI của bạn thông qua `ai config set OPENAI_KEY=<your token>`",
   "Set config": "Cài đặt cấu hình",
   "Enter your OpenAI API key": "Nhập khóa API OpenAI của bạn",
   "(not set)": "(không được đặt)",
