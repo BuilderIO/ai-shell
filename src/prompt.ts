@@ -12,11 +12,15 @@ import { KnownError } from './helpers/error';
 import i18n from './helpers/i18n';
 
 const init = async () => {
-  const { LANGUAGE: language } = await getConfig();
-  i18n.setLanguage(language);
+  try {
+    const { LANGUAGE: language } = await getConfig();
+    i18n.setLanguage(language);
+  } catch {
+    i18n.setLanguage('en');
+  }
 };
 
-let examples: string[] = [];
+const examples: string[] = [];
 init().then(() => {
   examples.push(i18n.t('delete all log files'));
   examples.push(i18n.t('list js files'));
