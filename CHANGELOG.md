@@ -1,3 +1,7 @@
+## 0.1.23
+
+- Add support for Android [#75](https://github.com/BuilderIO/ai-shell/pull/75)
+
 ## 0.1.22
 
 - Fix a crash on linux [#64](https://github.com/BuilderIO/ai-shell/issues/64)
