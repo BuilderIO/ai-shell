@@ -74,9 +74,7 @@ async function promptForRevision() {
     {
       prompt: () =>
         p.text({
-          message: i18n.t(
-            'What would you like me to change in this script?'
-          ),
+          message: i18n.t('What would you like me to change in this script?'),
           placeholder: i18n.t('e.g. change the folder name'),
           validate: (value) => {
             if (!value) return i18n.t('Please enter a prompt.');
