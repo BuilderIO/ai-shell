@@ -50,7 +50,7 @@ async function getPrompt(prompt?: string) {
     {
       prompt: () =>
         p.text({
-          message: i18n.t('What would you like me to to do?'),
+          message: i18n.t('What would you like me to do?'),
           placeholder: `${i18n.t('e.g.')} ${sample(examples)}`,
           initialValue: prompt,
           defaultValue: i18n.t('Say hello'),
@@ -75,7 +75,7 @@ async function promptForRevision() {
       prompt: () =>
         p.text({
           message: i18n.t(
-            'What would you like me to to change in this script?'
+            'What would you like me to change in this script?'
           ),
           placeholder: i18n.t('e.g. change the folder name'),
           validate: (value) => {
