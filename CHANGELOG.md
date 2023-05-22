@@ -1,3 +1,8 @@
+## 1.0.0
+
+- Overdue major version bump to signify the stability of this CLI
+- Add Indonesian language support
+
 ## 0.1.23
 
 - Add support for Android [#75](https://github.com/BuilderIO/ai-shell/pull/75)
