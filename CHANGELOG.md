@@ -1,3 +1,7 @@
+## 1.0.1
+
+- Fix a typo ("to to" -> "to") [#78](https://github.com/BuilderIO/ai-shell/pull/78)
+
 ## 1.0.0
 
 - Overdue major version bump to signify the stability of this CLI
