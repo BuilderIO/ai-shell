@@ -11,6 +11,7 @@ import ukTranslation from '../locales/uk.json';
 import viTranslation from '../locales/vi.json';
 import arTranslation from '../locales/ar.json';
 import ptTranslation from '../locales/pt.json';
+import idTranslation from '../locales/id.json';
 
 let currentlang: string = 'en';
 
@@ -28,6 +29,7 @@ const languages: Record<string, string> = {
   vi: 'Tiếng Việt', // Vietnamese
   ar: 'العربية', // Arabic
   pt: 'Português', // Portuguese
+  id: 'Indonesia', // Indonesia
 };
 
 i18next.init({
@@ -69,6 +71,9 @@ i18next.init({
     },
     pt: {
       translation: ptTranslation,
+    },
+    id: {
+      translation: idTranslation,
     },
   },
 });
