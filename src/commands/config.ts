@@ -39,6 +39,10 @@ export default command(
         for (const key of keyValues) {
           if (hasOwn(config, key)) {
             console.log(`${key}=${config[key as keyof typeof config]}`);
+          } else {
+            throw new KnownError(
+              `${i18n.t('Invalid config property')}: ${key}`
+            );
           }
         }
         return;
