@@ -102,14 +102,6 @@ export async function prompt({
   } = await getConfig();
   const skipCommandExplanation = silentMode || SILENT_MODE;
 
-  if (!key) {
-    throw new KnownError(
-      i18n.t(
-        'Please set your OpenAI API key via `ai config set OPENAI_KEY=<your token>`'
-      )
-    );
-  }
-
   console.log('');
   p.intro(`${cyan(`${projectName}`)}`);
 
