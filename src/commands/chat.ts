@@ -2,8 +2,6 @@ import { command } from 'cleye';
 import { spinner, intro, outro, text, isCancel } from '@clack/prompts';
 import { cyan, green } from 'kolorist';
 import { generateCompletion, readData } from '../helpers/completion';
-import { parseAssert } from '../prompt';
-import { KnownError } from '../helpers/error';
 import { getConfig } from '../helpers/config';
 import { streamToIterable } from '../helpers/stream-to-iterable';
 import { ChatCompletionRequestMessage } from 'openai';
@@ -20,18 +18,10 @@ export default command(
       await getConfig();
     const chatHistory: ChatCompletionRequestMessage[] = [];
 
-    if (!key) {
-      throw new KnownError(
-        i18n.t(
-          'Please set your OpenAI API key via `ai config set OPENAI_KEY=<your token>`'
-        )
-      );
-    }
-
     console.log('');
     intro(i18n.t('Starting new conversation'));
     const prompt = async () => {
-      let msgYou = `${i18n.t('You')}:`;
+      const msgYou = `${i18n.t('You')}:`;
       const userPrompt = (await text({
         message: `${cyan(msgYou)}`,
         placeholder: i18n.t(`send a message ('exit' to quit)`),
