@@ -21,7 +21,7 @@ export default command(
     console.log('');
     intro(i18n.t('Starting new conversation'));
     const prompt = async () => {
-      let msgYou = `${i18n.t('You')}:`;
+      const msgYou = `${i18n.t('You')}:`;
       const userPrompt = (await text({
         message: `${cyan(msgYou)}`,
         placeholder: i18n.t(`send a message ('exit' to quit)`),
