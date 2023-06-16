@@ -156,6 +156,7 @@ The AI Shell's default language is English, but you can easily switch to your pr
 | Vietnamese          | vi      |
 | Arabic              | ar      |
 | Portuguese          | pt      |
+| Turkish             | tr      |
 
 For instance, if you want to switch to Simplified Chinese, you can do so by setting the LANGUAGE value to zh-Hans:
 
