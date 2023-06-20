@@ -1,3 +1,8 @@
+## 1.0.2
+
+- Add Turkish language support
+- Improve config UX (correctly `await` on setting configs)
+
 ## 1.0.1
 
 - Fix a typo ("to to" -> "to") [#78](https://github.com/BuilderIO/ai-shell/pull/78)
