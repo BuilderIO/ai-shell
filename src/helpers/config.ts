@@ -172,32 +172,32 @@ export const showConfigUI = async () => {
         },
       });
       if (p.isCancel(key)) return;
-      setConfigs([['OPENAI_KEY', key]]);
+      await setConfigs([['OPENAI_KEY', key]]);
     } else if (choice === 'OPENAI_API_ENDPOINT') {
       const apiEndpoint = await p.text({
         message: i18n.t('Enter your OpenAI API Endpoint'),
       });
       if (p.isCancel(apiEndpoint)) return;
-      setConfigs([['OPENAI_API_ENDPOINT', apiEndpoint]]);
+      await setConfigs([['OPENAI_API_ENDPOINT', apiEndpoint]]);
     } else if (choice === 'SILENT_MODE') {
       const silentMode = await p.confirm({
         message: i18n.t('Enable silent mode?'),
       });
       if (p.isCancel(silentMode)) return;
-      setConfigs([['SILENT_MODE', silentMode ? 'true' : 'false']]);
+      await setConfigs([['SILENT_MODE', silentMode ? 'true' : 'false']]);
     } else if (choice === 'model') {
       const model = await p.text({
         message: i18n.t('Enter the model you want to use'),
       });
       if (p.isCancel(model)) return;
-      setConfigs([['model', model]]);
+      await setConfigs([['model', model]]);
     } else if (choice === 'LANGUAGE') {
       const language = (await p.select({
         message: i18n.t('Enter the language you want to use'),
         options: languagesOptions,
       })) as string;
       if (p.isCancel(language)) return;
-      setConfigs([['LANGUAGE', language]]);
+      await setConfigs([['LANGUAGE', language]]);
       i18n.setLanguage(language);
     }
     if (choice === 'cancel') return;
