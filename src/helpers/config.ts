@@ -36,7 +36,7 @@ const configParsers = {
 
     return key;
   },
-  model(model?: string) {
+  MODEL(model?: string) {
     if (!model || model.length === 0) {
       return 'gpt-3.5-turbo';
     }
@@ -142,8 +142,8 @@ export const showConfigUI = async () => {
         },
         {
           label: i18n.t('Model'),
-          value: 'model',
-          hint: hasOwn(config, 'model') ? config.model : i18n.t('(not set)'),
+          value: 'MODEL',
+          hint: hasOwn(config, 'MODEL') ? config.MODEL : i18n.t('(not set)'),
         },
         {
           label: i18n.t('Language'),
@@ -185,12 +185,12 @@ export const showConfigUI = async () => {
       });
       if (p.isCancel(silentMode)) return;
       await setConfigs([['SILENT_MODE', silentMode ? 'true' : 'false']]);
-    } else if (choice === 'model') {
+    } else if (choice === 'MODEL') {
       const model = await p.text({
         message: i18n.t('Enter the model you want to use'),
       });
       if (p.isCancel(model)) return;
-      await setConfigs([['model', model]]);
+      await setConfigs([['MODEL', model]]);
     } else if (choice === 'LANGUAGE') {
       const language = (await p.select({
         message: i18n.t('Enter the language you want to use'),

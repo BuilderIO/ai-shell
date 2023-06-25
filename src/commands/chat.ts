@@ -14,8 +14,11 @@ export default command(
       'start a new chat session to send and receive messages, continue replying until the user chooses to exit.',
   },
   async () => {
-    const { OPENAI_KEY: key, OPENAI_API_ENDPOINT: apiEndpoint } =
-      await getConfig();
+    const {
+      OPENAI_KEY: key,
+      OPENAI_API_ENDPOINT: apiEndpoint,
+      MODEL: model,
+    } = await getConfig();
     const chatHistory: ChatCompletionRequestMessage[] = [];
 
     console.log('');
@@ -44,6 +47,7 @@ export default command(
       const { readResponse } = await getResponse({
         prompt: chatHistory,
         key,
+        model,
         apiEndpoint,
       });
 
