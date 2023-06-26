@@ -1,3 +1,7 @@
+## 1.0.3
+
+- Fix choosing custom models
+
 ## 1.0.2
 
 - Add Turkish language support
