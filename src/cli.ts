@@ -20,11 +20,11 @@ cli(
       },
       silent: {
         type: Boolean,
-        description: 'less verbose, skip printing the command explanation ',
+        description: 'Less verbose, skip printing the command explanation ',
         alias: 's',
       },
     },
-    commands: [config, chat],
+    commands: [config, chat, update],
   },
   (argv) => {
     const silentMode = argv.flags.silent;

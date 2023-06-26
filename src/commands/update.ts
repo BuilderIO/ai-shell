@@ -6,7 +6,9 @@ import i18n from '../helpers/i18n';
 export default command(
   {
     name: 'update',
-    description: 'Update AI Shell to the latest version',
+    help: {
+      description: 'Update AI Shell to the latest version',
+    },
   },
   async () => {
     console.log('');

@@ -10,8 +10,10 @@ import i18n from '../helpers/i18n';
 export default command(
   {
     name: 'chat',
-    description:
-      'start a new chat session to send and receive messages, continue replying until the user chooses to exit.',
+    help: {
+      description:
+        'Start a new chat session to send and receive messages, continue replying until the user chooses to exit.',
+    },
   },
   async () => {
     const {
