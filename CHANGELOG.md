@@ -1,3 +1,7 @@
+## 1.0.4
+
+- Improve `--help` menu descriptions
+
 ## 1.0.3
 
 - Fix choosing custom models
