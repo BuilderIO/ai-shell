@@ -13,7 +13,9 @@ export default command(
   {
     name: 'config',
     parameters: ['[mode]', '[key=value...]'],
-    description: 'Configure the CLI',
+    help: {
+      description: 'Configure the CLI',
+    },
   },
   (argv) => {
     (async () => {
