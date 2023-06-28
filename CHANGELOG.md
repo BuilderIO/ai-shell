@@ -1,3 +1,7 @@
+## 1.0.5
+
+- Fix using the configured model in all cases
+
 ## 1.0.4
 
 - Improve `--help` menu descriptions
