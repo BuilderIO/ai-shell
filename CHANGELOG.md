@@ -1,3 +1,7 @@
+## 1.0.6
+
+- Fix for streaming data including the shell command name erroneously, causing the command to fail
+
 ## 1.0.5
 
 - Fix using the configured model in all cases
