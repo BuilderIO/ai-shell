@@ -18,6 +18,10 @@ function getOpenAi(key: string, apiEndpoint: string) {
   return openAi;
 }
 
+// Openai outputs markdown format for code blocks. It oftne uses
+// a github style like: "```bash"
+const shellCodeStartRegex = /```[^\n]*/gi;
+
 export async function getScriptAndInfo({
   prompt,
   key,
@@ -40,11 +44,11 @@ export async function getScriptAndInfo({
   const iterableStream = streamToIterable(stream);
   const codeBlock = '```';
   return {
-    readScript: readData(iterableStream, () => true, codeBlock),
+    readScript: readData(iterableStream, () => true, shellCodeStartRegex),
     readInfo: readData(
       iterableStream,
       (content) => content.endsWith(codeBlock),
-      codeBlock
+      shellCodeStartRegex
     ),
   };
 }
@@ -176,7 +180,7 @@ export async function getRevision({
   });
   const iterableStream = streamToIterable(stream);
   return {
-    readScript: readData(iterableStream, () => true, '```'),
+    readScript: readData(iterableStream, () => true),
   };
 }
 
@@ -184,13 +188,14 @@ export const readData =
   (
     iterableStream: AsyncGenerator<string, void>,
     startSignal: (content: string) => boolean,
-    excluded?: string
+    excluded?: RegExp
   ) =>
   (writer: (data: string) => void): Promise<string> =>
     new Promise(async (resolve) => {
       let data = '';
       let content = '';
       let dataStart = false;
+      let waitUntilNewline = false;
 
       for await (const chunk of iterableStream) {
         const payloads = chunk.toString().split('\n\n');
@@ -204,9 +209,19 @@ export const readData =
 
           if (payload.startsWith('data:')) {
             content = parseContent(payload);
-            if (!dataStart && content.includes(excluded ?? '')) {
+            if (!dataStart && content.match(excluded ?? '')) {
               dataStart = startSignal(content);
+              if (!content.includes('\n')) {
+                waitUntilNewline = true;
+              }
               if (excluded) break;
+            }
+
+            if (content && waitUntilNewline) {
+              if (!content.includes('\n')) {
+                continue;
+              }
+              waitUntilNewline = false;
             }
 
             if (dataStart && content) {
