@@ -36,6 +36,13 @@ const configParsers = {
 
     return key;
   },
+  AZURE_OPENAI_DEPLOYMENT(name?: string) {
+    if(!name || name.length === 0) {
+      return 'chat-yvo'; // gpt-35-turbo
+    }
+
+    return name;
+  },
   MODEL(model?: string) {
     if (!model || model.length === 0) {
       return 'gpt-3.5-turbo';

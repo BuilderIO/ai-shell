@@ -4,6 +4,7 @@
   "version": "1.0.6",
   "type": "module",
   "dependencies": {
+    "@azure/openai": "^1.0.0-beta.5",
     "@clack/core": "latest",
     "@clack/prompts": "latest",
     "@dqbd/tiktoken": "^1.0.2",
