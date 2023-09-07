@@ -14,12 +14,15 @@ export async function* streamToIterable(stream: IncomingMessage | AsyncIterable<
     }
 
     // changing single line code blocks to multilines
-    previous = previous.replace(/```([^\n]+)```/ig, '```\n$1\n```');
+    previous = previous.replace(/^```([^\n]+)```$/ig, '```\n$1\n```');
     const lines  = previous.split('\n');
     for(let i = 0; i < lines.length; i++) {
       let line = lines[i];
+      if(i < lines.length - 1) {
+        line = `${line}\n`;
+      }
       const msg = {
-        choices: [{delta: {content: `\n${line}`}}],
+        choices: [{delta: {content: line}}],
       };
       yield `data: ${JSON.stringify(msg)}`;
     }
