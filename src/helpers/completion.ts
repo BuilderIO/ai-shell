@@ -73,8 +73,8 @@ export async function generateCompletion({
   apiEndpoint: string;
 }) {
   try {
-    const { AZURE_OPENAI_DEPLOYMENT: deployment} = await getConfig();
     if(apiEndpoint.endsWith('.openai.azure.com')) {
+      const { AZURE_OPENAI_DEPLOYMENT: deployment} = await getConfig();
       const messages =  Array.isArray(prompt)
       ? prompt
       : [ {role: 'user', content: prompt } ];
