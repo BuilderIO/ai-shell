@@ -54,5 +54,7 @@
   "Missing required parameter": "Falta el parámetro requerido",
   "Please open a Bug report with the information above": "Por favor abra un informe de error con la información anterior",
   "Prompt to run": "Indicio para ejecutar",
-  "You": "Tú"
+  "You": "Tú",
+  "Azure OpenAI Deployment": "Implementación de Azure OpenAI",
+  "Enter your Azure OpenAI API Deployment ID": "Ingrese su ID de implementación de la API de Azure OpenAI"
 }

@@ -85,7 +85,7 @@ i18next.init({
  */
 const t = (key: string): string => {
   if (!currentlang || currentlang === 'en') return key;
-  return i18next.t(key) as string;
+  return (i18next.t(key) || key) as string;
 };
 
 const setLanguage = (lang: string) => {

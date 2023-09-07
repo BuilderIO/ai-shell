@@ -54,5 +54,7 @@
   "Missing required parameter": "Отсутствует обязательный параметр",
   "Please open a Bug report with the information above": "Пожалуйста, откройте отчет об ошибке с указанной выше информацией",
   "Prompt to run": "Приглашение на запуск",
-  "You": "Вы"
+  "You": "Вы",
+  "Azure OpenAI Deployment": "Развертывание Azure OpenAI",
+  "Enter your Azure OpenAI API Deployment ID": "Введите идентификатор развертывания API Azure OpenAI"
 }

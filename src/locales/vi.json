@@ -54,5 +54,7 @@
   "Missing required parameter": "Thiếu tham số bắt buộc",
   "Please open a Bug report with the information above": "Vui lòng mở một báo cáo lỗi với thông tin ở trên",
   "Prompt to run": "Lời nhắc để chạy",
-  "You": "Bạn"
+  "You": "Bạn",
+  "Azure OpenAI Deployment": "Triển khai Azure OpenAIt",
+  "Enter your Azure OpenAI API Deployment ID": "Nhập ID triển khai API Azure OpenAI của bạn"
 }

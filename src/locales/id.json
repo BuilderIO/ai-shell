@@ -54,5 +54,7 @@
   "Missing required parameter": "Parameter yang diperlukan hilang",
   "Please open a Bug report with the information above": "Harap buka laporan Bug dengan informasi di atas",
   "Prompt to run": "Permintaan untuk dijalankan",
-  "You": "Anda"
+  "You": "Anda",
+  "Azure OpenAI Deployment": "Penerapan Azure OpenAI",
+  "Enter your Azure OpenAI API Deployment ID": "Masukkan ID Penerapan API Azure OpenAI anda"
 }

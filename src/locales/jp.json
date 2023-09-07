@@ -54,5 +54,7 @@
   "Missing required parameter": "必要なパラメーターがありません",
   "Please open a Bug report with the information above": "上記の情報を含めてバグレポートを開いてください",
   "Prompt to run": "実行するプロンプト",
-  "You": "あなた"
+  "You": "あなた",
+  "Azure OpenAI Deployment": "Azure OpenAI のデプロイメント",
+  "Enter your Azure OpenAI API Deployment ID": "Azure OpenAI API デプロイメント ID を入力してください"
 }

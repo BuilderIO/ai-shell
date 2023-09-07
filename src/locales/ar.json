@@ -54,5 +54,7 @@
   "Missing required parameter": "معلمة مطلوبة مفقودة",
   "Please open a Bug report with the information above": "يرجى فتح تقرير خلل مع المعلومات أعلاه",
   "Prompt to run": "تشغيل التعليمات",
-  "You": "أنت"
+  "You": "أنت",
+  "Azure OpenAI Deployment": " نشر Azure OpenAI",
+  "Enter your Azure OpenAI API Deployment ID": "أدخل معرف نشر Azure OpenAI API الخاص بك"
 }

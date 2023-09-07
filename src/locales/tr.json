@@ -54,5 +54,7 @@
   "Missing required parameter": "Gerekli parametre eksik",
   "Please open a Bug report with the information above": "Lütfen yukarıdaki bilgilerle bir Hata raporu açın",
   "Prompt to run": "Çalıştırma istemi",
-  "You": "Siz"
+  "You": "Siz",
+  "Azure OpenAI Deployment": "Azure OpenAI Dağıtımı",
+  "Enter your Azure OpenAI API Deployment ID": "Azure OpenAI API Dağıtım Kimliğinizi girin"
 }

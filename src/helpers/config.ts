@@ -148,6 +148,13 @@ export const showConfigUI = async () => {
             : i18n.t('(not set)'),
         },
         {
+          label: i18n.t('Azure OpenAI Deployment'),
+          value: 'AZURE_OPENAI_DEPLOYMENT',
+          hint: hasOwn(config, 'AZURE_OPENAI_DEPLOYMENT')
+            ? config.AZURE_OPENAI_DEPLOYMENT.toString()
+            : i18n.t('(not set)'),
+        },
+        {
           label: i18n.t('Model'),
           value: 'MODEL',
           hint: hasOwn(config, 'MODEL') ? config.MODEL : i18n.t('(not set)'),
@@ -186,6 +193,12 @@ export const showConfigUI = async () => {
       });
       if (p.isCancel(apiEndpoint)) return;
       await setConfigs([['OPENAI_API_ENDPOINT', apiEndpoint]]);
+    } else if(choice === 'AZURE_OPENAI_DEPLOYMENT') {
+      const deploymentId = await p.text({
+        message: i18n.t('Enter your Azure OpenAI API Deployment ID'),
+      });
+      if (p.isCancel(deploymentId)) return;
+      await setConfigs([['AZURE_OPENAI_DEPLOYMENT', deploymentId]]);
     } else if (choice === 'SILENT_MODE') {
       const silentMode = await p.confirm({
         message: i18n.t('Enable silent mode?'),

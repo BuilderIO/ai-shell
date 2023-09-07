@@ -54,5 +54,7 @@
   "Missing required parameter": "缺少必需的參數",
   "Please open a Bug report with the information above": "請使用上面的信息打開 Bug 報告",
   "Prompt to run": "要運行的提示語",
-  "You": "您"
+  "You": "您",
+  "Azure OpenAI Deployment": "Azure OpenAI 部署",
+  "Enter your Azure OpenAI API Deployment ID": "輸入您的 Azure OpenAI API 部署 ID"
 }
