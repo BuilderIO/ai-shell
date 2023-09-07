@@ -38,7 +38,7 @@ const configParsers = {
   },
   AZURE_OPENAI_DEPLOYMENT(name?: string) {
     if(!name || name.length === 0) {
-      return 'chat-yvo'; // gpt-35-turbo
+      return 'gpt-35-turbo';
     }
 
     return name;
