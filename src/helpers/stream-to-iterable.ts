@@ -2,7 +2,7 @@ import { IncomingMessage } from 'http';
 import type { ChatCompletions } from '@azure/openai';
 
 export async function* streamToIterable(
-  stream: IncomingMessage | AsyncIterable<ChatCompletions>,
+  stream: IncomingMessage | AsyncIterable<ChatCompletions>
 ) {
   let previous = '';
   if (!(stream instanceof IncomingMessage)) {

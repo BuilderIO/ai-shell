@@ -29,8 +29,8 @@ export default command(
       if (!keyValues.length) {
         console.error(
           `${i18n.t('Error')}: ${i18n.t(
-            'Missing required parameter',
-          )} "key=value"\n`,
+            'Missing required parameter'
+          )} "key=value"\n`
         );
         argv.showHelp();
         return process.exit(1);
@@ -43,7 +43,7 @@ export default command(
             console.log(`${key}=${config[key as keyof typeof config]}`);
           } else {
             throw new KnownError(
-              `${i18n.t('Invalid config property')}: ${key}`,
+              `${i18n.t('Invalid config property')}: ${key}`
             );
           }
         }
@@ -52,7 +52,7 @@ export default command(
 
       if (mode === 'set') {
         await setConfigs(
-          keyValues.map((keyValue) => keyValue.split('=') as [string, string]),
+          keyValues.map((keyValue) => keyValue.split('=') as [string, string])
         );
         return;
       }
@@ -63,5 +63,5 @@ export default command(
       handleCliError(error);
       process.exit(1);
     });
-  },
+  }
 );
