@@ -62,7 +62,9 @@ export default command(
         role: 'assistant',
         content: fullResponse,
       });
-      console.log('');
+      if(!fullResponse.endsWith('\n')) {
+        console.log('');
+      }
       console.log('');
       prompt();
     };

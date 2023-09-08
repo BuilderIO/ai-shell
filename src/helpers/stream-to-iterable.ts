@@ -18,11 +18,8 @@ export async function* streamToIterable(stream: IncomingMessage | AsyncIterable<
     const lines  = previous.split('\n');
     for(let i = 0; i < lines.length; i++) {
       let line = lines[i];
-      if(i < lines.length - 1) {
-        line = `${line}\n`;
-      }
       const msg = {
-        choices: [{delta: {content: line}}],
+        choices: [{delta: {content: `${line}\n`}}],
       };
       yield `data: ${JSON.stringify(msg)}`;
     }
