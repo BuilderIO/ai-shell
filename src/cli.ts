@@ -39,5 +39,5 @@ cli(
         process.exit(1);
       });
     }
-  }
+  },
 );

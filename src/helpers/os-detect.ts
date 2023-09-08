@@ -13,7 +13,7 @@ export function detectShell() {
   } catch (err: unknown) {
     if (err instanceof Error) {
       throw new Error(
-        `${i18n.t('Shell detection failed unexpectedly')}: ${err.message}`
+        `${i18n.t('Shell detection failed unexpectedly')}: ${err.message}`,
       );
     }
   }

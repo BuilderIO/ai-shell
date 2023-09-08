@@ -1,9 +1,11 @@
 import { IncomingMessage } from 'http';
-import type { ChatCompletions } from "@azure/openai";
+import type { ChatCompletions } from '@azure/openai';
 
-export async function* streamToIterable(stream: IncomingMessage | AsyncIterable<ChatCompletions>) {
+export async function* streamToIterable(
+  stream: IncomingMessage | AsyncIterable<ChatCompletions>,
+) {
   let previous = '';
-  if(!(stream instanceof IncomingMessage)) {
+  if (!(stream instanceof IncomingMessage)) {
     for await (const chunk of stream) {
       for (const choice of chunk.choices) {
         const delta = choice.delta?.content;
@@ -14,12 +16,12 @@ export async function* streamToIterable(stream: IncomingMessage | AsyncIterable<
     }
 
     // changing single line code blocks to multilines
-    previous = previous.replace(/^```([^\n]+)```$/ig, '```\n$1\n```');
-    const lines  = previous.split('\n');
-    for(let i = 0; i < lines.length; i++) {
+    previous = previous.replace(/^```([^\n]+)```$/gi, '```\n$1\n```');
+    const lines = previous.split('\n');
+    for (let i = 0; i < lines.length; i++) {
       let line = lines[i];
       const msg = {
-        choices: [{delta: {content: `${line}\n`}}],
+        choices: [{ delta: { content: `${line}\n` } }],
       };
       yield `data: ${JSON.stringify(msg)}`;
     }

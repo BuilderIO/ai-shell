@@ -56,13 +56,13 @@ export default command(
       infoSpin.stop(`${green('AI Shell:')}`);
       console.log('');
       const fullResponse = await readResponse(
-        process.stdout.write.bind(process.stdout)
+        process.stdout.write.bind(process.stdout),
       );
       chatHistory.push({
         role: 'assistant',
         content: fullResponse,
       });
-      if(!fullResponse.endsWith('\n')) {
+      if (!fullResponse.endsWith('\n')) {
         console.log('');
       }
       console.log('');
@@ -70,7 +70,7 @@ export default command(
     };
 
     prompt();
-  }
+  },
 );
 
 async function getResponse({

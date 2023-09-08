@@ -64,7 +64,7 @@ async function getPrompt(prompt?: string) {
         p.cancel(i18n.t('Goodbye!'));
         process.exit(0);
       },
-    }
+    },
   );
   return (await group).prompt;
 }
@@ -86,7 +86,7 @@ async function promptForRevision() {
         p.cancel(i18n.t('Goodbye!'));
         process.exit(0);
       },
-    }
+    },
   );
   return (await group).prompt;
 }
@@ -118,7 +118,7 @@ export async function prompt({
   spin.stop(`${i18n.t('Your script')}:`);
   console.log('');
   const script = await readScript(process.stdout.write.bind(process.stdout));
-  if(!script.endsWith('\n')) console.log('');
+  if (!script.endsWith('\n')) console.log('');
   console.log('');
   console.log(dim('•'));
   if (!skipCommandExplanation) {
@@ -134,7 +134,7 @@ export async function prompt({
       console.log('');
       info = await readExplanation(process.stdout.write.bind(process.stdout));
     }
-    if(!info.endsWith('\n')) console.log('');
+    if (!info.endsWith('\n')) console.log('');
     console.log('');
     console.log(dim('•'));
   }
@@ -147,7 +147,7 @@ async function runOrReviseFlow(
   key: string,
   model: string,
   apiEndpoint: string,
-  silentMode?: boolean
+  silentMode?: boolean,
 ) {
   const emptyScript = script.trim() === '';
 
@@ -216,7 +216,7 @@ async function revisionFlow(
   key: string,
   model: string,
   apiEndpoint: string,
-  silentMode?: boolean
+  silentMode?: boolean,
 ) {
   const revision = await promptForRevision();
   const spin = p.spinner();
@@ -232,7 +232,7 @@ async function revisionFlow(
 
   console.log('');
   const script = await readScript(process.stdout.write.bind(process.stdout));
-  if(!script.endsWith('\n')) console.log('');
+  if (!script.endsWith('\n')) console.log('');
   console.log('');
   console.log(dim('•'));
 
@@ -248,8 +248,10 @@ async function revisionFlow(
 
     infoSpin.stop(`${i18n.t('Explanation')}:`);
     console.log('');
-    const result = await readExplanation(process.stdout.write.bind(process.stdout));
-    if(!result.endsWith('\n')) console.log('');
+    const result = await readExplanation(
+      process.stdout.write.bind(process.stdout),
+    );
+    if (!result.endsWith('\n')) console.log('');
     console.log('');
     console.log(dim('•'));
   }
@@ -260,7 +262,7 @@ async function revisionFlow(
 export const parseAssert = (name: string, condition: any, message: string) => {
   if (!condition) {
     throw new KnownError(
-      `${i18n.t('Invalid config property')} ${name}: ${message}`
+      `${i18n.t('Invalid config property')} ${name}: ${message}`,
     );
   }
 };
