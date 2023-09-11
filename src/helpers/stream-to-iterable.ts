@@ -7,23 +7,23 @@ export async function* streamToIterable(
   let previous = '';
   if (!(stream instanceof IncomingMessage)) {
     for await (const chunk of stream) {
-      for (const choice of chunk.choices) {
-        const delta = choice.delta?.content;
-        if (delta !== undefined) {
-          previous += delta;
+      const choice = chunk.choices[0];
+      if(!choice) continue;
+      const delta = choice.delta?.content;
+      if (delta !== undefined) {
+        previous += delta;
+      }
+      if (previous.indexOf('\n') >= 0) {
+        previous = previous.replace(/^```([^\n]+)```$/gi, '```\n$1\n```');
+        const lines = previous.split('\n');
+        for (let i = 0; i < lines.length - 1; i++) {
+          let line = lines[i];
+          const msg = {
+            choices: [{ delta: { content: `${line}\n` } }],
+          };
+          yield `data: ${JSON.stringify(msg)}`;
         }
-        if (previous.indexOf('\n') >= 0) {
-          previous = previous.replace(/^```([^\n]+)```$/gi, '```\n$1\n```');
-          const lines = previous.split('\n');
-          for (let i = 0; i < lines.length - 1; i++) {
-            let line = lines[i];
-            const msg = {
-              choices: [{ delta: { content: `${line}\n` } }],
-            };
-            yield `data: ${JSON.stringify(msg)}`;
-          }
-          previous = lines[lines.length - 1];
-        }
+        previous = lines[lines.length - 1];
       }
     }
 
