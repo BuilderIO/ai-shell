@@ -23,7 +23,7 @@ function getOpenAi(key: string, apiEndpoint: string) {
 
 // Openai outputs markdown format for code blocks. It often uses
 // a github style like: "```bash"
-const shellCodeStartRegex = /```[^\n]*/gi;
+const shellCodeStartRegex = /```[^\n]*\n?/gi;
 
 export async function getScriptAndInfo({
   prompt,

@@ -12,18 +12,31 @@ export async function* streamToIterable(
         if (delta !== undefined) {
           previous += delta;
         }
+        if (previous.indexOf('\n') >= 0) {
+          previous = previous.replace(/^```([^\n]+)```$/gi, '```\n$1\n```');
+          const lines = previous.split('\n');
+          for (let i = 0; i < lines.length - 1; i++) {
+            let line = lines[i];
+            const msg = {
+              choices: [{ delta: { content: `${line}\n` } }],
+            };
+            yield `data: ${JSON.stringify(msg)}`;
+          }
+          previous = lines[lines.length - 1];
+        }
       }
     }
 
-    // changing single line code blocks to multilines
-    previous = previous.replace(/^```([^\n]+)```$/gi, '```\n$1\n```');
-    const lines = previous.split('\n');
-    for (let i = 0; i < lines.length; i++) {
-      let line = lines[i];
-      const msg = {
-        choices: [{ delta: { content: `${line}\n` } }],
-      };
-      yield `data: ${JSON.stringify(msg)}`;
+    if (previous) {
+      previous = previous.replace(/^```([^\n]+)```$/gi, '```\n$1\n```');
+      const lines = previous.split('\n');
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+        const msg = {
+          choices: [{ delta: { content: `${line}\n` } }],
+        };
+        yield `data: ${JSON.stringify(msg)}`;
+      }
     }
   } else {
     for await (const chunk of stream) {
