@@ -54,5 +54,7 @@
   "Missing required parameter": "필수 매개변수가 누락되었습니다.",
   "Please open a Bug report with the information above": "위 정보를 포함하여 버그 보고서를 열어주세요.",
   "Prompt to run": "실행할 프롬프트",
-  "You": "당신"
+  "You": "당신",
+  "Azure OpenAI Deployment": "Azure OpenAI 배포",
+  "Enter your Azure OpenAI API Deployment ID": "Azure OpenAI API 배포 ID를 입력하세요."
 }

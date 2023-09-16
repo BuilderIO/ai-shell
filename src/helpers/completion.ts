@@ -8,6 +8,9 @@ import type { AxiosError } from 'axios';
 import { streamToString } from './stream-to-string';
 import './replace-all-polyfill';
 import i18n from './i18n';
+import { getConfig } from './config';
+
+import { OpenAIClient, AzureKeyCredential } from '@azure/openai';
 
 const explainInSecondRequest = true;
 
@@ -18,9 +21,9 @@ function getOpenAi(key: string, apiEndpoint: string) {
   return openAi;
 }
 
-// Openai outputs markdown format for code blocks. It oftne uses
+// Openai outputs markdown format for code blocks. It often uses
 // a github style like: "```bash"
-const shellCodeStartRegex = /```[^\n]*/gi;
+const shellCodeStartRegex = /```[^\n]*\n?/gi;
 
 export async function getScriptAndInfo({
   prompt,
@@ -66,8 +69,20 @@ export async function generateCompletion({
   key: string;
   apiEndpoint: string;
 }) {
-  const openAi = getOpenAi(key, apiEndpoint);
   try {
+    if (apiEndpoint.endsWith('.openai.azure.com')) {
+      const { AZURE_OPENAI_DEPLOYMENT: deployment } = await getConfig();
+      const messages = Array.isArray(prompt)
+        ? prompt
+        : [{ role: 'user', content: prompt }];
+      const client = new OpenAIClient(apiEndpoint, new AzureKeyCredential(key));
+      const deploymentId = deployment;
+      const events = client.listChatCompletions(deploymentId, messages, {
+        maxTokens: 1024,
+      });
+      return events;
+    }
+    const openAi = getOpenAi(key, apiEndpoint);
     const completion = await openAi.createChatCompletion(
       {
         model: model || 'gpt-3.5-turbo',
@@ -216,14 +231,12 @@ export const readData =
               }
               if (excluded) break;
             }
-
             if (content && waitUntilNewline) {
               if (!content.includes('\n')) {
                 continue;
               }
               waitUntilNewline = false;
             }
-
             if (dataStart && content) {
               const contentWithoutExcluded = excluded
                 ? content.replaceAll(excluded, '')

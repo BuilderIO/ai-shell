@@ -61,13 +61,13 @@ Once Prettier is installed, you can run it on a single file or multiple files us
 1. For a single file:
 
 ```sh
-prettier --write path/to/your/file.js
+prettier --write path/to/your/file.ts
 ```
 
 2. For a multiple file:
 
 ```sh
-prettier --write "src/**/*.js"
+prettier --write "src/**/*.ts"
 ```
 
 If you use Vscode, It is recommended to use [prettier-vscode][https://github.com/prettier/prettier-vscode]

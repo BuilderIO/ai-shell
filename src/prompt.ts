@@ -118,12 +118,12 @@ export async function prompt({
   spin.stop(`${i18n.t('Your script')}:`);
   console.log('');
   const script = await readScript(process.stdout.write.bind(process.stdout));
-  console.log('');
+  if (!script.endsWith('\n')) console.log('');
   console.log('');
   console.log(dim('•'));
   if (!skipCommandExplanation) {
     spin.start(i18n.t(`Getting explanation...`));
-    const info = await readInfo(process.stdout.write.bind(process.stdout));
+    let info = await readInfo(process.stdout.write.bind(process.stdout));
     if (!info) {
       const { readExplanation } = await getExplanation({
         script,
@@ -132,11 +132,11 @@ export async function prompt({
       });
       spin.stop(`${i18n.t('Explanation')}:`);
       console.log('');
-      await readExplanation(process.stdout.write.bind(process.stdout));
-      console.log('');
-      console.log('');
-      console.log(dim('•'));
+      info = await readExplanation(process.stdout.write.bind(process.stdout));
     }
+    if (!info.endsWith('\n')) console.log('');
+    console.log('');
+    console.log(dim('•'));
   }
 
   await runOrReviseFlow(script, key, model, apiEndpoint, silentMode);
@@ -232,7 +232,7 @@ async function revisionFlow(
 
   console.log('');
   const script = await readScript(process.stdout.write.bind(process.stdout));
-  console.log('');
+  if (!script.endsWith('\n')) console.log('');
   console.log('');
   console.log(dim('•'));
 
@@ -248,8 +248,10 @@ async function revisionFlow(
 
     infoSpin.stop(`${i18n.t('Explanation')}:`);
     console.log('');
-    await readExplanation(process.stdout.write.bind(process.stdout));
-    console.log('');
+    const result = await readExplanation(
+      process.stdout.write.bind(process.stdout)
+    );
+    if (!result.endsWith('\n')) console.log('');
     console.log('');
     console.log(dim('•'));
   }

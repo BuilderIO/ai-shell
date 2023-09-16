@@ -54,5 +54,7 @@
   "Missing required parameter": "Parâmetro obrigatório faltando",
   "Please open a Bug report with the information above": "Por favor, abra um relatório de bug com as informações acima",
   "Prompt to run": "Prompt para executar",
-  "You": "Você"
+  "You": "Você",
+  "Azure OpenAI Deployment": "Implantação OpenAI do Azure",
+  "Enter your Azure OpenAI API Deployment ID": "Insira seu ID de implantação da API Azure OpenAI"
 }
