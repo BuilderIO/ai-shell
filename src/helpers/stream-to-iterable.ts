@@ -8,7 +8,7 @@ export async function* streamToIterable(
   if (!(stream instanceof IncomingMessage)) {
     for await (const chunk of stream) {
       const choice = chunk.choices[0];
-      if(!choice) continue;
+      if (!choice) continue;
       const delta = choice.delta?.content;
       if (delta !== undefined) {
         previous += delta;
