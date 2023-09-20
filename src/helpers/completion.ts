@@ -181,7 +181,11 @@ export async function getRevision({
   });
   const iterableStream = streamToIterable(stream);
   return {
-    readScript: readData(iterableStream),
+    readScript: readData(
+      iterableStream,
+      shellCodeStartRegex,
+      shellCodeEndRegex
+    ),
   };
 }
 
