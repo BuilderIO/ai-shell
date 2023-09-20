@@ -8,6 +8,7 @@ import type { AxiosError } from 'axios';
 import { streamToString } from './stream-to-string';
 import './replace-all-polyfill';
 import i18n from './i18n';
+import { stripRegexPatterns } from './strip-regex-patterns';
 
 const explainInSecondRequest = true;
 
@@ -20,7 +21,8 @@ function getOpenAi(key: string, apiEndpoint: string) {
 
 // Openai outputs markdown format for code blocks. It oftne uses
 // a github style like: "```bash"
-const shellCodeStartRegex = /```[^\n]*/gi;
+const shellCodeStartRegex = /```[a-zA-Z]*\n/gi;
+const shellCodeEndRegex = /```[a-zA-Z]*/gi;
 
 export async function getScriptAndInfo({
   prompt,
@@ -42,14 +44,13 @@ export async function getScriptAndInfo({
     apiEndpoint,
   });
   const iterableStream = streamToIterable(stream);
-  const codeBlock = '```';
   return {
-    readScript: readData(iterableStream, () => true, shellCodeStartRegex),
-    readInfo: readData(
+    readScript: readData(
       iterableStream,
-      (content) => content.endsWith(codeBlock),
-      shellCodeStartRegex
+      shellCodeStartRegex,
+      shellCodeEndRegex
     ),
+    readInfo: readData(iterableStream, shellCodeStartRegex, shellCodeEndRegex),
   };
 }
 
@@ -154,7 +155,7 @@ export async function getExplanation({
     apiEndpoint,
   });
   const iterableStream = streamToIterable(stream);
-  return { readExplanation: readData(iterableStream, () => true) };
+  return { readExplanation: readData(iterableStream) };
 }
 
 export async function getRevision({
@@ -180,22 +181,23 @@ export async function getRevision({
   });
   const iterableStream = streamToIterable(stream);
   return {
-    readScript: readData(iterableStream, () => true),
+    readScript: readData(iterableStream),
   };
 }
 
 export const readData =
   (
     iterableStream: AsyncGenerator<string, void>,
-    startSignal: (content: string) => boolean,
-    excluded?: RegExp
+    excludedPrefix?: RegExp,
+    excludedSuffix?: RegExp
   ) =>
   (writer: (data: string) => void): Promise<string> =>
     new Promise(async (resolve) => {
       let data = '';
       let content = '';
       let dataStart = false;
-      let waitUntilNewline = false;
+      // This buffer will temporarily hold incoming data only for detecting the start
+      let buffer = '';
 
       for await (const chunk of iterableStream) {
         const payloads = chunk.toString().split('\n\n');
@@ -209,25 +211,24 @@ export const readData =
 
           if (payload.startsWith('data:')) {
             content = parseContent(payload);
-            if (!dataStart && content.match(excluded ?? '')) {
-              dataStart = startSignal(content);
-              if (!content.includes('\n')) {
-                waitUntilNewline = true;
+            // Use buffer only for start detection
+            if (!dataStart) {
+              // Append content to the buffer
+              buffer += content;
+              if (buffer.match(excludedPrefix ?? '')) {
+                dataStart = true;
+                // Clear the buffer once it has served its purpose
+                buffer = '';
+                if (excludedPrefix) break;
               }
-              if (excluded) break;
-            }
-
-            if (content && waitUntilNewline) {
-              if (!content.includes('\n')) {
-                continue;
-              }
-              waitUntilNewline = false;
             }
 
             if (dataStart && content) {
-              const contentWithoutExcluded = excluded
-                ? content.replaceAll(excluded, '')
-                : content;
+              const contentWithoutExcluded = stripRegexPatterns(content, [
+                excludedPrefix,
+                excludedSuffix,
+              ]);
+
               data += contentWithoutExcluded;
               writer(contentWithoutExcluded);
             }
