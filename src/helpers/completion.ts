@@ -21,8 +21,7 @@ function getOpenAi(key: string, apiEndpoint: string) {
 
 // Openai outputs markdown format for code blocks. It oftne uses
 // a github style like: "```bash"
-const shellCodeStartRegex = /```[a-zA-Z]*\n/gi;
-const shellCodeEndRegex = /```[a-zA-Z]*/gi;
+const shellCodeExclusions = [/```[a-zA-Z]*\n/gi, /```[a-zA-Z]*/gi, '\n'];
 
 export async function getScriptAndInfo({
   prompt,
@@ -45,12 +44,8 @@ export async function getScriptAndInfo({
   });
   const iterableStream = streamToIterable(stream);
   return {
-    readScript: readData(
-      iterableStream,
-      shellCodeStartRegex,
-      shellCodeEndRegex
-    ),
-    readInfo: readData(iterableStream, shellCodeStartRegex, shellCodeEndRegex),
+    readScript: readData(iterableStream, ...shellCodeExclusions),
+    readInfo: readData(iterableStream, ...shellCodeExclusions),
   };
 }
 
@@ -181,19 +176,14 @@ export async function getRevision({
   });
   const iterableStream = streamToIterable(stream);
   return {
-    readScript: readData(
-      iterableStream,
-      shellCodeStartRegex,
-      shellCodeEndRegex
-    ),
+    readScript: readData(iterableStream, ...shellCodeExclusions),
   };
 }
 
 export const readData =
   (
     iterableStream: AsyncGenerator<string, void>,
-    excludedPrefix?: RegExp,
-    excludedSuffix?: RegExp
+    ...excluded: (RegExp | string | undefined)[]
   ) =>
   (writer: (data: string) => void): Promise<string> =>
     new Promise(async (resolve) => {
@@ -202,6 +192,8 @@ export const readData =
       let dataStart = false;
       // This buffer will temporarily hold incoming data only for detecting the start
       let buffer = '';
+
+      const [excludedPrefix] = excluded;
 
       for await (const chunk of iterableStream) {
         const payloads = chunk.toString().split('\n\n');
@@ -228,10 +220,10 @@ export const readData =
             }
 
             if (dataStart && content) {
-              const contentWithoutExcluded = stripRegexPatterns(content, [
-                excludedPrefix,
-                excludedSuffix,
-              ]);
+              const contentWithoutExcluded = stripRegexPatterns(
+                content,
+                excluded
+              );
 
               data += contentWithoutExcluded;
               writer(contentWithoutExcluded);
