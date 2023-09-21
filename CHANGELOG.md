@@ -1,3 +1,7 @@
+## 1.0.7
+
+- Fix a bug causing completions to not display in some cases
+
 ## 1.0.6
 
 - Fix for streaming data including the shell command name erroneously, causing the command to fail
