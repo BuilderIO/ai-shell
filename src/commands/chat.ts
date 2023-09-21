@@ -94,5 +94,5 @@ async function getResponse({
 
   const iterableStream = streamToIterable(stream);
 
-  return { readResponse: readData(iterableStream, () => true) };
+  return { readResponse: readData(iterableStream) };
 }
