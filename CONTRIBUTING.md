@@ -70,4 +70,4 @@ prettier --write path/to/your/file.js
 prettier --write "src/**/*.js"
 ```
 
-If you use Vscode, It is recommended to use [prettier-vscode][https://github.com/prettier/prettier-vscode]
+If you use Vscode, It is recommended to use [prettier-vscode](https://github.com/prettier/prettier-vscode)
