@@ -9,6 +9,7 @@ import { streamToString } from './stream-to-string';
 import './replace-all-polyfill';
 import i18n from './i18n';
 import { stripRegexPatterns } from './strip-regex-patterns';
+import readline from 'readline';
 
 const explainInSecondRequest = true;
 
@@ -187,6 +188,20 @@ export const readData =
   ) =>
   (writer: (data: string) => void): Promise<string> =>
     new Promise(async (resolve) => {
+      const rl = readline.createInterface({
+        input: process.stdin,
+      });
+    
+      rl.input.setRawMode(true);
+    
+      rl.input.on('keypress', (key) => {
+    
+        if (typeof key === 'string' && key.toLowerCase().includes('q')) {
+          stopWriting = true;
+        }
+      });
+
+      let stopWriting = false;
       let data = '';
       let content = '';
       let dataStart = false;
@@ -199,7 +214,7 @@ export const readData =
         const payloads = chunk.toString().split('\n\n');
 
         for (const payload of payloads) {
-          if (payload.includes('[DONE]')) {
+          if (payload.includes('[DONE]' || stopWriting)) {
             dataStart = false;
             resolve(data);
             return;
