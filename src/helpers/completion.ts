@@ -15,7 +15,7 @@ const explainInSecondRequest = true;
 
 function getOpenAi(key: string, apiEndpoint: string) {
   const openAi = new OpenAIApi(
-    new Configuration({ apiKey: key, basePath: apiEndpoint }),
+    new Configuration({ apiKey: key, basePath: apiEndpoint })
   );
   return openAi;
 }
@@ -74,7 +74,7 @@ export async function generateCompletion({
         n: Math.min(number, 10),
         stream: true,
       },
-      { responseType: 'stream' },
+      { responseType: 'stream' }
     );
 
     return completion.data as unknown as IncomingMessage;
@@ -83,7 +83,7 @@ export async function generateCompletion({
 
     if (error.code === 'ENOTFOUND') {
       throw new KnownError(
-        `Error connecting to ${error.request.hostname} (${error.request.syscall}). Are you connected to the internet?`,
+        `Error connecting to ${error.request.hostname} (${error.request.syscall}). Are you connected to the internet?`
       );
     }
 
@@ -91,7 +91,7 @@ export async function generateCompletion({
     let message = response?.data as string | object | IncomingMessage;
     if (response && message instanceof IncomingMessage) {
       message = await streamToString(
-        response.data as unknown as IncomingMessage,
+        response.data as unknown as IncomingMessage
       );
       try {
         // Handle if the message is JSON. It should be but occasionally will
@@ -114,7 +114,7 @@ export async function generateCompletion({
       ` +
           '\n\n' +
           messageString +
-          '\n',
+          '\n'
       );
     } else if (response && message) {
       throw new KnownError(
@@ -123,7 +123,7 @@ export async function generateCompletion({
       ` +
           '\n\n' +
           messageString +
-          '\n',
+          '\n'
       );
     }
 
@@ -188,74 +188,64 @@ export const readData =
   ) =>
   (writer: (data: string) => void): Promise<string> =>
     new Promise(async (resolve) => {
+      let stopTextStream = false;
+      let data = '';
+      let content = '';
+      let dataStart = false;
+      let buffer = '';
+      const [excludedPrefix] = excluded;
+      const stopTextStreamKeys = ['q', 'escape'];
+
       const rl = readline.createInterface({
         input: process.stdin,
       });
 
-      rl.input.setRawMode(true);
+      process.stdin.setRawMode(true);
 
-      rl.input.on('keypress', (key) => {
-        if (typeof key === 'string' && key.toLowerCase().includes('q')) {
-          stopWriting = true;
+      process.stdin.on('keypress', (key, data) => {
+        if (stopTextStreamKeys.includes(data.name)) {
+          stopTextStream = true;
         }
       });
-
-      let stopWriting = false;
-      let data = '';
-      let content = '';
-      let dataStart = false;
-      // This buffer will temporarily hold incoming data only for detecting the start
-      let buffer = '';
-
-      const [excludedPrefix] = excluded;
-
       for await (const chunk of iterableStream) {
         const payloads = chunk.toString().split('\n\n');
-
         for (const payload of payloads) {
-          if (payload.includes('[DONE]' || stopWriting)) {
+          if (payload.includes('[DONE]') || stopTextStream) {
             dataStart = false;
             resolve(data);
             return;
           }
-
           if (payload.startsWith('data:')) {
             content = parseContent(payload);
-            // Use buffer only for start detection
             if (!dataStart) {
-              // Append content to the buffer
               buffer += content;
               if (buffer.match(excludedPrefix ?? '')) {
                 dataStart = true;
-                // Clear the buffer once it has served its purpose
                 buffer = '';
                 if (excludedPrefix) break;
               }
             }
-
             if (dataStart && content) {
               const contentWithoutExcluded = stripRegexPatterns(
                 content,
-                excluded,
+                excluded
               );
-
               data += contentWithoutExcluded;
               writer(contentWithoutExcluded);
             }
           }
         }
       }
-
-      function parseContent(payload: string): string {
-        const data = payload.replaceAll(/(\n)?^data:\s*/g, '');
+      function parseContent(payload) {
+        const data2 = payload.replaceAll(/(\n)?^data:\s*/g, '');
         try {
-          const delta = JSON.parse(data.trim());
+          const delta = JSON.parse(data2.trim());
           return delta.choices?.[0].delta?.content ?? '';
         } catch (error) {
-          return `Error with JSON.parse and ${payload}.\n${error}`;
+          return `Error with JSON.parse and ${payload}.
+${error}`;
         }
       }
-
       resolve(data);
     });
 
