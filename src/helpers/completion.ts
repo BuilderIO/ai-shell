@@ -192,9 +192,10 @@ export const readData =
       let data = '';
       let content = '';
       let dataStart = false;
-      let buffer = '';
+      let buffer = ''; // This buffer will temporarily hold incoming data only for detecting the start
+
       const [excludedPrefix] = excluded;
-      const stopTextStreamKeys = ['q', 'escape'];
+      const stopTextStreamKeys = ['q', 'escape']; //Group of keys that stop the text stream
 
       const rl = readline.createInterface({
         input: process.stdin,
@@ -215,37 +216,44 @@ export const readData =
             resolve(data);
             return;
           }
+
           if (payload.startsWith('data:')) {
             content = parseContent(payload);
+            // Use buffer only for start detection
             if (!dataStart) {
+              // Append content to the buffer
               buffer += content;
               if (buffer.match(excludedPrefix ?? '')) {
                 dataStart = true;
+                // Clear the buffer once it has served its purpose
                 buffer = '';
                 if (excludedPrefix) break;
               }
             }
+
             if (dataStart && content) {
               const contentWithoutExcluded = stripRegexPatterns(
                 content,
                 excluded
               );
+
               data += contentWithoutExcluded;
               writer(contentWithoutExcluded);
             }
           }
         }
       }
-      function parseContent(payload) {
-        const data2 = payload.replaceAll(/(\n)?^data:\s*/g, '');
+
+      function parseContent(payload: string): string {
+        const data = payload.replaceAll(/(\n)?^data:\s*/g, '');
         try {
-          const delta = JSON.parse(data2.trim());
+          const delta = JSON.parse(data.trim());
           return delta.choices?.[0].delta?.content ?? '';
         } catch (error) {
-          return `Error with JSON.parse and ${payload}.
-${error}`;
+          return `Error with JSON.parse and ${payload}.\n${error}`;
         }
       }
+
       resolve(data);
     });
 
