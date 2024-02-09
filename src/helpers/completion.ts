@@ -9,6 +9,7 @@ import { streamToString } from './stream-to-string';
 import './replace-all-polyfill';
 import i18n from './i18n';
 import { stripRegexPatterns } from './strip-regex-patterns';
+import readline from 'readline';
 
 const explainInSecondRequest = true;
 
@@ -187,19 +188,30 @@ export const readData =
   ) =>
   (writer: (data: string) => void): Promise<string> =>
     new Promise(async (resolve) => {
+      let stopTextStream = false;
       let data = '';
       let content = '';
       let dataStart = false;
-      // This buffer will temporarily hold incoming data only for detecting the start
-      let buffer = '';
+      let buffer = ''; // This buffer will temporarily hold incoming data only for detecting the start
 
       const [excludedPrefix] = excluded;
+      const stopTextStreamKeys = ['q', 'escape']; //Group of keys that stop the text stream
 
+      const rl = readline.createInterface({
+        input: process.stdin,
+      });
+
+      process.stdin.setRawMode(true);
+
+      process.stdin.on('keypress', (key, data) => {
+        if (stopTextStreamKeys.includes(data.name)) {
+          stopTextStream = true;
+        }
+      });
       for await (const chunk of iterableStream) {
         const payloads = chunk.toString().split('\n\n');
-
         for (const payload of payloads) {
-          if (payload.includes('[DONE]')) {
+          if (payload.includes('[DONE]') || stopTextStream) {
             dataStart = false;
             resolve(data);
             return;
