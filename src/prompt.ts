@@ -22,7 +22,8 @@ const init = async () => {
 };
 
 const examples: string[] = [];
-init().then(() => {
+const initPromise = init();
+initPromise.then(() => {
   examples.push(i18n.t('delete all log files'));
   examples.push(i18n.t('list js files'));
   examples.push(i18n.t('fetch me a random joke'));
@@ -46,6 +47,7 @@ async function runScript(script: string) {
 }
 
 async function getPrompt(prompt?: string) {
+  await initPromise;
   const group = p.group(
     {
       prompt: () =>
@@ -118,6 +120,7 @@ export async function prompt({
   spin.stop(`${i18n.t('Your script')}:`);
   console.log('');
   const script = await readScript(process.stdout.write.bind(process.stdout));
+  console.log('script', script);
   console.log('');
   console.log('');
   console.log(dim('•'));

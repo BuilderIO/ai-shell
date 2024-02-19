@@ -191,13 +191,11 @@ export const readData =
       let stopTextStream = false;
       let data = '';
       let content = '';
-      let dataStart = false;
-      let buffer = ''; // This buffer will temporarily hold incoming data only for detecting the start
+      let dataStart = true;
 
-      const [excludedPrefix] = excluded;
       const stopTextStreamKeys = ['q', 'escape']; //Group of keys that stop the text stream
 
-      const rl = readline.createInterface({
+      readline.createInterface({
         input: process.stdin,
       });
 
@@ -219,17 +217,6 @@ export const readData =
 
           if (payload.startsWith('data:')) {
             content = parseContent(payload);
-            // Use buffer only for start detection
-            if (!dataStart) {
-              // Append content to the buffer
-              buffer += content;
-              if (buffer.match(excludedPrefix ?? '')) {
-                dataStart = true;
-                // Clear the buffer once it has served its purpose
-                buffer = '';
-                if (excludedPrefix) break;
-              }
-            }
 
             if (dataStart && content) {
               const contentWithoutExcluded = stripRegexPatterns(
