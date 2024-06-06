@@ -1,4 +1,5 @@
 ## 1.0.8
+
 - Fix a bug causing completions to not display in some cases
 - Allow hitting "q" or "esc" to stop the streaming output
 

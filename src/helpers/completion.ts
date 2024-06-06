@@ -1,4 +1,9 @@
-import { OpenAIApi, Configuration, ChatCompletionRequestMessage } from 'openai';
+import {
+  OpenAIApi,
+  Configuration,
+  ChatCompletionRequestMessage,
+  Model,
+} from 'openai';
 import dedent from 'dedent';
 import { IncomingMessage } from 'http';
 import { KnownError } from './error';
@@ -312,4 +317,14 @@ function getRevisionPrompt(prompt: string, code: string) {
 
     ${generationDetails}
   `;
+}
+
+export async function getModels(
+  key: string,
+  apiEndpoint: string
+): Promise<Model[]> {
+  const openAi = getOpenAi(key, apiEndpoint);
+  const response = await openAi.listModels();
+
+  return response.data.data.filter((model) => model.object === 'model');
 }
