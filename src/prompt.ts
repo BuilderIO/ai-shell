@@ -11,6 +11,7 @@ import { projectName } from './helpers/constants';
 import { KnownError } from './helpers/error';
 import clipboardy from 'clipboardy';
 import i18n from './helpers/i18n';
+import { appendToShellHistory } from './helpers/shell-history';
 
 const init = async () => {
   try {
@@ -38,12 +39,15 @@ const sample = <T>(arr: T[]): T | undefined => {
 async function runScript(script: string) {
   p.outro(`${i18n.t('Running')}: ${script}`);
   console.log('');
-  await execaCommand(script, {
-    stdio: 'inherit',
-    shell: process.env.SHELL || true,
-  }).catch(() => {
+  try {
+    await execaCommand(script, {
+      stdio: 'inherit',
+      shell: process.env.SHELL || true,
+    });
+    appendToShellHistory(script);
+  } catch (error) {
     // Nothing needed, it'll output to stderr
-  });
+  }
 }
 
 async function getPrompt(prompt?: string) {
