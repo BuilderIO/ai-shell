@@ -4,7 +4,6 @@ import { cyan, green } from 'kolorist';
 import { generateCompletion, readData } from '../helpers/completion';
 import { getConfig } from '../helpers/config';
 import { streamToIterable } from '../helpers/stream-to-iterable';
-import { ChatCompletionRequestMessage } from 'openai';
 import i18n from '../helpers/i18n';
 
 export default command(
@@ -16,12 +15,8 @@ export default command(
     },
   },
   async () => {
-    const {
-      OPENAI_KEY: key,
-      OPENAI_API_ENDPOINT: apiEndpoint,
-      MODEL: model,
-    } = await getConfig();
-    const chatHistory: ChatCompletionRequestMessage[] = [];
+    const { ANTHROPIC_KEY: key, MODEL: model } = await getConfig();
+    const chatHistory: { role: string; content: string }[] = [];
 
     console.log('');
     intro(i18n.t('Starting new conversation'));
@@ -50,7 +45,6 @@ export default command(
         prompt: chatHistory,
         key,
         model,
-        apiEndpoint,
       });
 
       infoSpin.stop(`${green('AI Shell:')}`);
@@ -76,20 +70,17 @@ async function getResponse({
   number = 1,
   key,
   model,
-  apiEndpoint,
 }: {
-  prompt: string | ChatCompletionRequestMessage[];
+  prompt: string | { role: string; content: string }[];
   number?: number;
   model?: string;
   key: string;
-  apiEndpoint: string;
 }) {
   const stream = await generateCompletion({
     prompt,
     key,
     model,
     number,
-    apiEndpoint,
   });
 
   const iterableStream = streamToIterable(stream);

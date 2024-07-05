@@ -1,44 +1,34 @@
-import {
-  OpenAIApi,
-  Configuration,
-  ChatCompletionRequestMessage,
-  Model,
-} from 'openai';
+import axios from 'axios';
 import dedent from 'dedent';
 import { IncomingMessage } from 'http';
 import { KnownError } from './error';
 import { streamToIterable } from './stream-to-iterable';
 import { detectShell } from './os-detect';
-import type { AxiosError } from 'axios';
 import { streamToString } from './stream-to-string';
 import './replace-all-polyfill';
 import i18n from './i18n';
 import { stripRegexPatterns } from './strip-regex-patterns';
 import readline from 'readline';
+import Anthropic from '@anthropic-ai/sdk';
 
 const explainInSecondRequest = true;
 
-function getOpenAi(key: string, apiEndpoint: string) {
-  const openAi = new OpenAIApi(
-    new Configuration({ apiKey: key, basePath: apiEndpoint })
-  );
-  return openAi;
+function getAnthropicClient(key: string) {
+  return new Anthropic({
+    apiKey: key,
+  });
 }
 
-// Openai outputs markdown format for code blocks. It oftne uses
-// a github style like: "```bash"
-const shellCodeExclusions = [/```[a-zA-Z]*\n/gi, /```[a-zA-Z]*/gi, '\n'];
+const shellCodeExclusions = [/```[a-zA-Z]*\n*/gi, /```[a-zA-Z]*/gi, '\n'];
 
 export async function getScriptAndInfo({
   prompt,
   key,
   model,
-  apiEndpoint,
 }: {
   prompt: string;
   key: string;
   model?: string;
-  apiEndpoint: string;
 }) {
   const fullPrompt = getFullPrompt(prompt);
   const stream = await generateCompletion({
@@ -46,7 +36,6 @@ export async function getScriptAndInfo({
     number: 1,
     key,
     model,
-    apiEndpoint,
   });
   const iterableStream = streamToIterable(stream);
   return {
@@ -60,47 +49,36 @@ export async function generateCompletion({
   number = 1,
   key,
   model,
-  apiEndpoint,
 }: {
-  prompt: string | ChatCompletionRequestMessage[];
+  prompt: string | { role: string; content: string }[];
   number?: number;
   model?: string;
   key: string;
-  apiEndpoint: string;
 }) {
-  const openAi = getOpenAi(key, apiEndpoint);
+  const anthropicClient = getAnthropicClient(key);
   try {
-    const completion = await openAi.createChatCompletion(
-      {
-        model: model || 'gpt-3.5-turbo',
-        messages: Array.isArray(prompt)
-          ? prompt
-          : [{ role: 'user', content: prompt }],
-        n: Math.min(number, 10),
-        stream: true,
-      },
-      { responseType: 'stream' }
-    );
+    const response = await anthropicClient.messages.create({
+      messages: Array.isArray(prompt)
+        ? prompt
+        : [{ role: 'user', content: prompt }],
+      model: model || 'claude-3-5-sonnet-20240620',
+      max_tokens: 200,
+      stream: true,
+    });
 
-    return completion.data as unknown as IncomingMessage;
-  } catch (err) {
-    const error = err as AxiosError;
-
-    if (error.code === 'ENOTFOUND') {
+    return response;
+  } catch (err: any) {
+    if (err.code === 'ENOTFOUND') {
       throw new KnownError(
-        `Error connecting to ${error.request.hostname} (${error.request.syscall}). Are you connected to the internet?`
+        `Error connecting to ${err.hostname} (${err.syscall}). Are you connected to the internet?`
       );
     }
 
-    const response = error.response;
-    let message = response?.data as string | object | IncomingMessage;
+    const response = err.response;
+    let message = response?.data;
     if (response && message instanceof IncomingMessage) {
-      message = await streamToString(
-        response.data as unknown as IncomingMessage
-      );
+      message = await streamToString(message);
       try {
-        // Handle if the message is JSON. It should be but occasionally will
-        // be HTML, so lets handle both
         message = JSON.parse(message);
       } catch (e) {
         // Ignore
@@ -111,11 +89,9 @@ export async function generateCompletion({
     if (response?.status === 429) {
       throw new KnownError(
         dedent`
-        Request to OpenAI failed with status 429. This is due to incorrect billing setup or excessive quota usage. Please follow this guide to fix it: https://help.openai.com/en/articles/6891831-error-code-429-you-exceeded-your-current-quota-please-check-your-plan-and-billing-details
+        Request to Anthropic failed with status 429. This may be due to rate limiting or quota issues.
 
-        You can activate billing here: https://platform.openai.com/account/billing/overview . Make sure to add a payment method if not under an active grant from OpenAI.
-
-        Full message from OpenAI:
+        Full message from Anthropic:
       ` +
           '\n\n' +
           messageString +
@@ -124,7 +100,7 @@ export async function generateCompletion({
     } else if (response && message) {
       throw new KnownError(
         dedent`
-        Request to OpenAI failed with status ${response?.status}:
+        Request to Anthropic failed with status ${response?.status}:
       ` +
           '\n\n' +
           messageString +
@@ -132,7 +108,7 @@ export async function generateCompletion({
       );
     }
 
-    throw error;
+    throw err;
   }
 }
 
@@ -140,12 +116,10 @@ export async function getExplanation({
   script,
   key,
   model,
-  apiEndpoint,
 }: {
   script: string;
   key: string;
   model?: string;
-  apiEndpoint: string;
 }) {
   const prompt = getExplanationPrompt(script);
   const stream = await generateCompletion({
@@ -153,7 +127,6 @@ export async function getExplanation({
     key,
     number: 1,
     model,
-    apiEndpoint,
   });
   const iterableStream = streamToIterable(stream);
   return { readExplanation: readData(iterableStream) };
@@ -164,13 +137,11 @@ export async function getRevision({
   code,
   key,
   model,
-  apiEndpoint,
 }: {
   prompt: string;
   code: string;
   key: string;
   model?: string;
-  apiEndpoint: string;
 }) {
   const fullPrompt = getRevisionPrompt(prompt, code);
   const stream = await generateCompletion({
@@ -178,7 +149,6 @@ export async function getRevision({
     key,
     number: 1,
     model,
-    apiEndpoint,
   });
   const iterableStream = streamToIterable(stream);
   return {
@@ -214,39 +184,43 @@ export const readData =
         }
       });
       for await (const chunk of iterableStream) {
-        const payloads = chunk.toString().split('\n\n');
-        for (const payload of payloads) {
+        const payloads = chunk.toString().split('\n');
+        payloads.forEach((payload, index) => {
+          if (index > 0) {
+              console.log(); // Print a newline
+          }
+          // TODO: why do we need this
           if (payload.includes('[DONE]') || stopTextStream) {
             dataStart = false;
             resolve(data);
             return;
           }
 
-          if (payload.startsWith('data:')) {
-            content = parseContent(payload);
-            // Use buffer only for start detection
-            if (!dataStart) {
-              // Append content to the buffer
-              buffer += content;
-              if (buffer.match(excludedPrefix ?? '')) {
-                dataStart = true;
-                // Clear the buffer once it has served its purpose
-                buffer = '';
-                if (excludedPrefix) break;
-              }
-            }
-
-            if (dataStart && content) {
-              const contentWithoutExcluded = stripRegexPatterns(
-                content,
-                excluded
-              );
-
-              data += contentWithoutExcluded;
-              writer(contentWithoutExcluded);
+          content = payload;
+          // console.log('debug: ' + content)
+          // console.log('datastart: ' + dataStart)
+          // Use buffer only for start detection
+          if (!dataStart) {
+            // Append content to the buffer
+            buffer += content;
+            if (buffer.match(excludedPrefix ?? '')) {
+              dataStart = true;
+              // Clear the buffer once it has served its purpose
+              buffer = '';
+              if (excludedPrefix) return;
             }
           }
-        }
+
+          if (dataStart && content) {
+            const contentWithoutExcluded = stripRegexPatterns(
+              content,
+              excluded
+            );
+            // console.log('debugstripped: ' + contentWithoutExcluded)
+            data += contentWithoutExcluded;
+            writer(contentWithoutExcluded);
+          }
+        })
       }
 
       function parseContent(payload: string): string {
@@ -319,12 +293,7 @@ function getRevisionPrompt(prompt: string, code: string) {
   `;
 }
 
-export async function getModels(
-  key: string,
-  apiEndpoint: string
-): Promise<Model[]> {
-  const openAi = getOpenAi(key, apiEndpoint);
-  const response = await openAi.listModels();
-
-  return response.data.data.filter((model) => model.object === 'model');
+export async function getModels(): Promise<string[]> {
+  // Anthropic doesn't have a public API for listing models, so we'll return a static list
+  return ['claude-2', 'claude-instant-1', 'claude-3-5-sonnet-20240620'];
 }

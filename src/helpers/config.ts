@@ -9,7 +9,6 @@ import * as p from '@clack/prompts';
 import { red } from 'kolorist';
 import i18n from './i18n';
 import { getModels } from './completion';
-import { Model } from 'openai';
 
 const { hasOwnProperty } = Object.prototype;
 export const hasOwn = (object: unknown, key: PropertyKey) =>
@@ -29,10 +28,10 @@ const parseAssert = (name: string, condition: any, message: string) => {
 };
 
 const configParsers = {
-  OPENAI_KEY(key?: string) {
+  ANTHROPIC_KEY(key?: string) {
     if (!key) {
       throw new KnownError(
-        `Please set your OpenAI API key via \`${commandName} config set OPENAI_KEY=<your token>\`` // TODO: i18n
+        `Please set your Anthropic API key via \`${commandName} config set ANTHROPIC_KEY=<your token>\``
       );
     }
 
@@ -40,16 +39,13 @@ const configParsers = {
   },
   MODEL(model?: string) {
     if (!model || model.length === 0) {
-      return 'gpt-3.5-turbo';
+      return 'claude-3-5-sonnet-20240620';
     }
 
-    return model as TiktokenModel;
+    return model;
   },
   SILENT_MODE(mode?: string) {
     return String(mode).toLowerCase() === 'true';
-  },
-  OPENAI_API_ENDPOINT(apiEndpoint?: string) {
-    return apiEndpoint || 'https://api.openai.com/v1';
   },
   LANGUAGE(language?: string) {
     return language || 'en';
@@ -121,18 +117,11 @@ export const showConfigUI = async () => {
       message: i18n.t('Set config') + ':',
       options: [
         {
-          label: i18n.t('OpenAI Key'),
-          value: 'OPENAI_KEY',
-          hint: hasOwn(config, 'OPENAI_KEY')
+          label: i18n.t('Anthropic Key'),
+          value: 'ANTHROPIC_KEY',
+          hint: hasOwn(config, 'ANTHROPIC_KEY')
             ? // Obfuscate the key
-              'sk-...' + config.OPENAI_KEY.slice(-3)
-            : i18n.t('(not set)'),
-        },
-        {
-          label: i18n.t('OpenAI API Endpoint'),
-          value: 'OPENAI_API_ENDPOINT',
-          hint: hasOwn(config, 'OPENAI_API_ENDPOINT')
-            ? config.OPENAI_API_ENDPOINT
+              'sk-...' + config.ANTHROPIC_KEY.slice(-3)
             : i18n.t('(not set)'),
         },
         {
@@ -164,9 +153,9 @@ export const showConfigUI = async () => {
 
     if (p.isCancel(choice)) return;
 
-    if (choice === 'OPENAI_KEY') {
+    if (choice === 'ANTHROPIC_KEY') {
       const key = await p.text({
-        message: i18n.t('Enter your OpenAI API key'),
+        message: i18n.t('Enter your anthropic API key'),
         validate: (value) => {
           if (!value.length) {
             return i18n.t('Please enter a key');
@@ -174,13 +163,7 @@ export const showConfigUI = async () => {
         },
       });
       if (p.isCancel(key)) return;
-      await setConfigs([['OPENAI_KEY', key]]);
-    } else if (choice === 'OPENAI_API_ENDPOINT') {
-      const apiEndpoint = await p.text({
-        message: i18n.t('Enter your OpenAI API Endpoint'),
-      });
-      if (p.isCancel(apiEndpoint)) return;
-      await setConfigs([['OPENAI_API_ENDPOINT', apiEndpoint]]);
+      await setConfigs([['ANTHROPIC_KEY', key]]);
     } else if (choice === 'SILENT_MODE') {
       const silentMode = await p.confirm({
         message: i18n.t('Enable silent mode?'),
@@ -188,13 +171,12 @@ export const showConfigUI = async () => {
       if (p.isCancel(silentMode)) return;
       await setConfigs([['SILENT_MODE', silentMode ? 'true' : 'false']]);
     } else if (choice === 'MODEL') {
-      const { OPENAI_KEY: key, OPENAI_API_ENDPOINT: apiEndpoint } =
-        await getConfig();
-      const models = await getModels(key, apiEndpoint);
+      const { ANTHROPIC_KEY: key } = await getConfig();
+      const models = await getModels();
       const model = (await p.select({
         message: 'Pick a model.',
-        options: models.map((m: Model) => {
-          return { value: m.id, label: m.id };
+        options: models.map((m: string) => {
+          return { value: m, label: m };
         }),
       })) as string;
 

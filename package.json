@@ -4,6 +4,7 @@
   "version": "1.0.9",
   "type": "module",
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.3",
     "@clack/core": "latest",
     "@clack/prompts": "latest",
     "@dqbd/tiktoken": "^1.0.2",
@@ -15,8 +16,7 @@
     "execa": "^7.1.1",
     "i18next": "^22.4.15",
     "ini": "^4.0.0",
-    "kolorist": "^1.7.0",
-    "openai": "^3.2.1"
+    "kolorist": "^1.7.0"
   },
   "repository": {
     "type": "git",
