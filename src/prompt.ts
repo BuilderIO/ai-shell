@@ -118,23 +118,27 @@ export async function prompt({
   console.log('');
   console.log(dim('•'));
   if (!skipCommandExplanation) {
-    spin.start(i18n.t(`Getting explanation...`));
-    const info = await readInfo(process.stdout.write.bind(process.stdout));
-    if (!info) {
-      const { readExplanation } = await getExplanation({
-        script,
-        key,
-      });
-      spin.stop(`${i18n.t('Explanation')}:`);
-      console.log('');
-      await readExplanation(process.stdout.write.bind(process.stdout));
-      console.log('');
-      console.log('');
-      console.log(dim('•'));
-    }
+    await getAndPrintExplanation(script, key)
   }
 
   await runOrReviseFlow(script, key, model, silentMode);
+}
+
+async function getAndPrintExplanation(  script: string,
+  key: string,
+) {
+  const spin = p.spinner();
+  spin.start(i18n.t(`Getting explanation...`));
+  const { readExplanation } = await getExplanation({
+    script,
+    key,
+  });
+  spin.stop(`${i18n.t('Explanation')}:`);
+  console.log('');
+  await readExplanation(process.stdout.write.bind(process.stdout));
+  console.log('');
+  console.log('');
+  console.log(dim('•'));
 }
 
 async function runOrReviseFlow(
@@ -173,6 +177,14 @@ async function runOrReviseFlow(
                 }
               },
             },
+            {
+              label: '📝 ' + 'Explain',
+              hint: i18n.t('Explain'),
+              value: async () => {
+                await getAndPrintExplanation(script, key)
+                runOrReviseFlow(script, key, model, silentMode)
+              },
+            }
           ]),
       {
         label: '🔁 ' + i18n.t('Revise'),
