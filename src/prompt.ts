@@ -124,7 +124,6 @@ export async function prompt({
   spin.stop(`${i18n.t('Your script')}:`);
   console.log('');
   const script = await readScript(process.stdout.write.bind(process.stdout));
-  console.log('script', script);
   console.log('');
   console.log('');
   console.log(dim('•'));
