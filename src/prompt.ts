@@ -134,6 +134,7 @@ export async function prompt({
       const { readExplanation } = await getExplanation({
         script,
         key,
+        model,
         apiEndpoint,
       });
       spin.stop(`${i18n.t('Explanation')}:`);
