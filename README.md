@@ -46,6 +46,38 @@
 
    This will create a `.ai-shell` file in your home directory.
 
+### Nix Setup (With Flakes)
+
+This package can be integrated into Nix environments as a custom package. Follow the steps below to set it up:
+
+1. **Add this package to your flakes inputs:**
+   ```nix
+   inputs.ai-shell.url = "github:BuilderIO/ai-shell";
+   ```
+
+2. **Add the package to your system or Home Manager configuration:**
+  - For Home Manager:
+    ```nix
+    home.packages = with pkgs; [
+      inputs.ai-shell.defaultPackage.x86_64-linux
+    ];
+    ```
+  - **or** for NixOS system packages:
+    ```nix
+    users.users.<your-username>.packages = with pkgs; [
+      inputs.ai-shell.defaultPackage.x86_64-linux
+    ];
+    ```
+
+3. **Activate the configuration:**
+   If you are on NixOS, execute:
+   ```bash
+   sudo nixos-rebuild switch --flake .#your-computer
+   ```
+
+And you are good to go!
+
+
 ## Usage
 
 ```bash

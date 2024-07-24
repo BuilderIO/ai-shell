@@ -14,6 +14,28 @@ Install the dependencies using npm:
 npm i
 ```
 
+### Nix Setup (With Flakes)
+
+Pull down this project locally.
+
+when you enter the directory if you have direnv installed run:
+
+```sh
+direnv allow
+```
+
+If you do not run
+
+```sh
+nix develop
+```
+
+this will pull down all dependencies, install hooks and formatters etc. You are now free to run.
+
+```sh
+npm i
+```
+
 ## Building the project
 
 Run the `build` script:
