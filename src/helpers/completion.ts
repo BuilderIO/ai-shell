@@ -253,7 +253,7 @@ export const readData =
         const data = payload.replaceAll(/(\n)?^data:\s*/g, '');
         try {
           const delta = JSON.parse(data.trim());
-          return delta.choices?.[0].delta?.content ?? '';
+          return delta.choices?.[0]?.delta?.content ?? '';
         } catch (error) {
           return `Error with JSON.parse and ${payload}.\n${error}`;
         }
