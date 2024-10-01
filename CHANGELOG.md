@@ -1,3 +1,8 @@
+## 1.0.12
+
+- Bug fixes
+- Default to gpt-4o-mini instead of gpt-3.5-turbo
+
 ## 1.0.8
 
 - Fix a bug causing completions to not display in some cases
