@@ -181,7 +181,7 @@ To get an interactive UI like below:
 │  ○ OpenAI Key
 │  ○ OpenAI API Endpoint
 │  ○ Silent Mode
-│  ● Model (gpt-3.5-turbo)
+│  ● Model (gpt-4o-mini)
 │  ○ Language
 │  ○ Cancel
 └

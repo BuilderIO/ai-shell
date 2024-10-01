@@ -72,7 +72,7 @@ export async function generateCompletion({
   try {
     const completion = await openAi.createChatCompletion(
       {
-        model: model || 'gpt-3.5-turbo',
+        model: model || 'gpt-4o-mini',
         messages: Array.isArray(prompt)
           ? prompt
           : [{ role: 'user', content: prompt }],
