@@ -225,12 +225,12 @@ If you want to help fix a bug or implement a feature in [Issues](https://github.
 
 ## Credit
 
-- Thanks to GitHub Copilot for their amazing tools and the idea for this
-- Thanks to Hassan and his work on [aicommits](https://github.com/Nutlope/aicommits) which inspired the workflow and some parts of the code and flows
+- Thanks to GitHub Copilot for their amazing tools and the idea for this.
+- Thanks to Hassan and his work on [aicommits](https://github.com/Nutlope/aicommits), which inspired the workflow and some parts of the code and flows
 
 ## Community
 
-Come join the [Builder.io discord](https://discord.gg/EMx6e58xnw) and chat with us in the #ai-shell room
+Come join the [Builder.io Discord](https://discord.gg/EMx6e58xnw) and chat with us in the #ai-shell room
 
 <br><br>
 
