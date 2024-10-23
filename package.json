@@ -27,7 +27,7 @@
   ],
   "bin": {
     "ai-shell": "./dist/cli.mjs",
-    "ai": "./dist/cli.mjs"
+    "aish": "./dist/cli.mjs"
   },
   "scripts": {
     "start": "jiti ./src/cli.ts",
