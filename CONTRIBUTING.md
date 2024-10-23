@@ -19,18 +19,10 @@ npm i
 Run the `build` script:
 
 ```sh
-npm build
+npm run build
 ```
 
 The package is bundled using [pkgroll](https://github.com/privatenumber/pkgroll) (Rollup). It infers the entry-points from `package.json` so there are no build configurations.
-
-### Development (watch) mode
-
-During development, you can use the watch flag (`--watch, -w`) to automatically rebuild the package on file changes:
-
-```sh
-npm build -w
-```
 
 ## Running the package locally
 
