@@ -148,7 +148,6 @@ export async function prompt({
 
   await runOrReviseFlow(script, key, model, apiEndpoint, silentMode);
 }
-
 async function runOrReviseFlow(
   script: string,
   key: string,
@@ -163,30 +162,38 @@ async function runOrReviseFlow(
       ? i18n.t('Revise this script?')
       : i18n.t('Run this script?'),
     options: [
+      {
+        label: '📋 ' + i18n.t('Copy'),
+        hint: i18n.t('Copy the generated script to your clipboard'),
+        value: async () => {
+          await clipboardy.write(script);
+          p.outro(i18n.t('Copied to clipboard!'));
+        },
+      },
       ...(emptyScript
         ? []
         : [
-            {
-              label: '✅ ' + i18n.t('Yes'),
-              hint: i18n.t('Lets go!'),
-              value: async () => {
-                await runScript(script);
-              },
+          {
+            label: '✅ ' + i18n.t('Yes'),
+            hint: i18n.t('Lets go!'),
+            value: async () => {
+              await runScript(script);
             },
-            {
-              label: '📝 ' + i18n.t('Edit'),
-              hint: i18n.t('Make some adjustments before running'),
-              value: async () => {
-                const newScript = await p.text({
-                  message: i18n.t('you can edit script here:'),
-                  initialValue: script,
-                });
-                if (!p.isCancel(newScript)) {
-                  await runScript(newScript);
-                }
-              },
+          },
+          {
+            label: '📝 ' + i18n.t('Edit'),
+            hint: i18n.t('Make some adjustments before running'),
+            value: async () => {
+              const newScript = await p.text({
+                message: i18n.t('you can edit script here:'),
+                initialValue: script,
+              });
+              if (!p.isCancel(newScript)) {
+                await runScript(newScript);
+              }
             },
-          ]),
+          },
+        ]),
       {
         label: '🔁 ' + i18n.t('Revise'),
         hint: i18n.t('Give feedback via prompt and get a new result'),
