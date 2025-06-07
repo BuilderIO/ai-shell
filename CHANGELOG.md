@@ -1,3 +1,12 @@
+## dev
+
+- **NEW ENGINE**: Added support for GigaChat
+- **BREAKING**: Renamed `MODEL` config to `OPENAI_MODEL` for clarity
+- **DEFAULT**: Changed default OpenAI model to `gpt-4.1-nano` (most cost-effective)
+- **FEATURE**: Added ability to change default config file path via `AI_SHELL_CONFIG_PATH` environment variable
+- **FEATURE**: Added Proxy PAC URL configuration support (`PROXY_PAC_URL`)
+- **FEATURE**: Added separate `ALL_PROXY` configuration for each AI engine (`OPENAI_ALLPROXY`, `GIGACHAT_ALLPROXY`)
+
 ## 1.0.12
 
 - Bug fixes

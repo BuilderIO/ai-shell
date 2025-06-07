@@ -15,14 +15,30 @@ import './replace-all-polyfill';
 import i18n from './i18n';
 import { stripRegexPatterns } from './strip-regex-patterns';
 import readline from 'readline';
+import { ProxyAgent } from 'proxy-agent';
+import { logger } from './logger';
+import { EngineConfig } from './engines/config-engine';
+import { EngineApi, ChatMessage } from './engines/engine-api';
 
 const explainInSecondRequest = true;
 
-function getOpenAi(key: string, apiEndpoint: string) {
+function getOpenAi(engineConfig: EngineConfig): OpenAIApi {
   const openAi = new OpenAIApi(
-    new Configuration({ apiKey: key, basePath: apiEndpoint })
+    new Configuration({
+      apiKey: engineConfig.apiKey,
+      basePath: engineConfig.apiEndpoint,
+    })
   );
   return openAi;
+}
+
+function getProxyAgent(engineConfig: EngineConfig): ProxyAgent {
+  const { proxy, proxyPacUrl } = engineConfig;
+  const proxyToUse = proxyPacUrl ? `pac+${proxyPacUrl}` : proxy;
+  logger.debug(proxyToUse ? `Use proxy: ${proxyToUse}` : 'Without proxy');
+  return new ProxyAgent({
+    getProxyForUrl: () => proxyToUse,
+  });
 }
 
 // Openai outputs markdown format for code blocks. It oftne uses
@@ -31,22 +47,19 @@ const shellCodeExclusions = [/```[a-zA-Z]*\n/gi, /```[a-zA-Z]*/gi, '\n'];
 
 export async function getScriptAndInfo({
   prompt,
-  key,
-  model,
-  apiEndpoint,
+  engineConfig,
 }: {
   prompt: string;
-  key: string;
-  model?: string;
-  apiEndpoint: string;
-}) {
+  engineConfig: EngineConfig;
+}): Promise<{
+  readScript: (writer: (data: string) => void) => Promise<string>,
+  readInfo: (writer: (data: string) => void) => Promise<string>,
+}> {
   const fullPrompt = getFullPrompt(prompt);
   const stream = await generateCompletion({
     prompt: fullPrompt,
     number: 1,
-    key,
-    model,
-    apiEndpoint,
+    engineConfig,
   });
   const iterableStream = streamToIterable(stream);
   return {
@@ -58,30 +71,30 @@ export async function getScriptAndInfo({
 export async function generateCompletion({
   prompt,
   number = 1,
-  key,
-  model,
-  apiEndpoint,
+  engineConfig,
 }: {
-  prompt: string | ChatCompletionRequestMessage[];
+  prompt: string | ChatMessage[];
   number?: number;
-  model?: string;
-  key: string;
-  apiEndpoint: string;
-}) {
-  const openAi = getOpenAi(key, apiEndpoint);
+  engineConfig: EngineConfig;
+}): Promise<IncomingMessage> {
+  const openAi = getOpenAi(engineConfig);
+  const agent = getProxyAgent(engineConfig);
   try {
     const completion = await openAi.createChatCompletion(
       {
-        model: model || 'gpt-4o-mini',
+        model: engineConfig.modelName,
         messages: Array.isArray(prompt)
-          ? prompt
+          ? (prompt as ChatCompletionRequestMessage[])
           : [{ role: 'user', content: prompt }],
         n: Math.min(number, 10),
         stream: true,
       },
-      { responseType: 'stream' }
+      {
+        responseType: 'stream',
+        httpAgent: agent,
+        httpsAgent: agent,
+      },
     );
-
     return completion.data as unknown as IncomingMessage;
   } catch (err) {
     const error = err as AxiosError;
@@ -138,22 +151,18 @@ export async function generateCompletion({
 
 export async function getExplanation({
   script,
-  key,
-  model,
-  apiEndpoint,
+  engineConfig,
 }: {
   script: string;
-  key: string;
-  model?: string;
-  apiEndpoint: string;
-}) {
+  engineConfig: EngineConfig;
+}): Promise<{
+  readExplanation: (writer: (data: string) => void) => Promise<string>,
+}> {
   const prompt = getExplanationPrompt(script);
   const stream = await generateCompletion({
     prompt,
-    key,
     number: 1,
-    model,
-    apiEndpoint,
+    engineConfig,
   });
   const iterableStream = streamToIterable(stream);
   return { readExplanation: readData(iterableStream) };
@@ -162,23 +171,19 @@ export async function getExplanation({
 export async function getRevision({
   prompt,
   code,
-  key,
-  model,
-  apiEndpoint,
+  engineConfig,
 }: {
   prompt: string;
   code: string;
-  key: string;
-  model?: string;
-  apiEndpoint: string;
-}) {
+  engineConfig: EngineConfig;
+}): Promise<{
+  readScript: (writer: (data: string) => void) => Promise<string>,
+}> {
   const fullPrompt = getRevisionPrompt(prompt, code);
   const stream = await generateCompletion({
     prompt: fullPrompt,
-    key,
     number: 1,
-    model,
-    apiEndpoint,
+    engineConfig,
   });
   const iterableStream = streamToIterable(stream);
   return {
@@ -186,81 +191,90 @@ export async function getRevision({
   };
 }
 
-export const readData =
-  (
-    iterableStream: AsyncGenerator<string, void>,
-    ...excluded: (RegExp | string | undefined)[]
-  ) =>
-  (writer: (data: string) => void): Promise<string> =>
-    new Promise(async (resolve) => {
-      let stopTextStream = false;
-      let data = '';
-      let content = '';
-      let dataStart = false;
-      let buffer = ''; // This buffer will temporarily hold incoming data only for detecting the start
-
-      const [excludedPrefix] = excluded;
-      const stopTextStreamKeys = ['q', 'escape']; //Group of keys that stop the text stream
-
-      const rl = readline.createInterface({
-        input: process.stdin,
-      });
-
-      process.stdin.setRawMode(true);
-
-      process.stdin.on('keypress', (key, data) => {
-        if (stopTextStreamKeys.includes(data.name)) {
-          stopTextStream = true;
-        }
-      });
-      for await (const chunk of iterableStream) {
-        const payloads = chunk.toString().split('\n\n');
-        for (const payload of payloads) {
-          if (payload.includes('[DONE]') || stopTextStream) {
-            dataStart = false;
-            resolve(data);
-            return;
-          }
-
-          if (payload.startsWith('data:')) {
-            content = parseContent(payload);
-            // Use buffer only for start detection
-            if (!dataStart) {
-              // Append content to the buffer
-              buffer += content;
-              if (buffer.match(excludedPrefix ?? '')) {
-                dataStart = true;
-                // Clear the buffer once it has served its purpose
-                buffer = '';
-                if (excludedPrefix) break;
-              }
-            }
-
-            if (dataStart && content) {
-              const contentWithoutExcluded = stripRegexPatterns(
-                content,
-                excluded
-              );
-
-              data += contentWithoutExcluded;
-              writer(contentWithoutExcluded);
-            }
-          }
-        }
-      }
-
-      function parseContent(payload: string): string {
-        const data = payload.replaceAll(/(\n)?^data:\s*/g, '');
-        try {
-          const delta = JSON.parse(data.trim());
-          return delta.choices?.[0]?.delta?.content ?? '';
-        } catch (error) {
-          return `Error with JSON.parse and ${payload}.\n${error}`;
-        }
-      }
-
-      resolve(data);
+export function readData(
+  iterableStream: AsyncGenerator<string, void>,
+  ...excluded: (RegExp | string | undefined)[]
+): (writer: (data: string) => void) => Promise<string> {
+  return (writer: (data: string) => void): Promise<string> => 
+    new Promise(async (resolve: (value: string) => void) => {
+      readDataImpl(iterableStream, excluded, writer, resolve);
     });
+}
+
+async function readDataImpl(
+  iterableStream: AsyncGenerator<string, void>,
+  excluded: (RegExp | string | undefined)[],
+  writer: (data: string) => void,
+  resolve: (data: string) => void,
+): Promise<void> {
+  let stopTextStream = false;
+  let data = '';
+  let content = '';
+  let dataStart = false;
+  let buffer = ''; // This buffer will temporarily hold incoming data only for detecting the start
+
+  const [excludedPrefix] = excluded;
+  const stopTextStreamKeys = ['q', 'escape']; //Group of keys that stop the text stream
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+  });
+
+  process.stdin.setRawMode(true);
+
+  process.stdin.on('keypress', (key, data) => {
+    if (stopTextStreamKeys.includes(data.name)) {
+      stopTextStream = true;
+    }
+  });
+  for await (const chunk of iterableStream) {
+    const payloads = chunk.toString().split('\n\n');
+    for (const payload of payloads) {
+      if (payload.includes('[DONE]') || stopTextStream) {
+        dataStart = false;
+        resolve(data);
+        return;
+      }
+
+      if (payload.startsWith('data:')) {
+        content = parseContent(payload);
+        // Use buffer only for start detection
+        if (!dataStart) {
+          // Append content to the buffer
+          buffer += content;
+          if (buffer.match(excludedPrefix ?? '')) {
+            dataStart = true;
+            // Clear the buffer once it has served its purpose
+            buffer = '';
+            if (excludedPrefix) break;
+          }
+        }
+
+        if (dataStart && content) {
+          const contentWithoutExcluded = stripRegexPatterns(
+            content,
+            excluded
+          );
+
+          data += contentWithoutExcluded;
+          writer(contentWithoutExcluded);
+        }
+      }
+    }
+  }
+
+  function parseContent(payload: string): string {
+    const data = payload.replaceAll(/(\n)?^data:\s*/g, '');
+    try {
+      const delta = JSON.parse(data.trim());
+      return delta.choices?.[0]?.delta?.content ?? '';
+    } catch (error) {
+      return `Error with JSON.parse and ${payload}.\n${error}`;
+    }
+  }
+
+  resolve(data);
+}
 
 function getExplanationPrompt(script: string) {
   return dedent`
@@ -272,7 +286,7 @@ function getExplanationPrompt(script: string) {
 
 function getShellDetails() {
   const shellDetails = detectShell();
-
+ 
   return dedent`
       The target shell is ${shellDetails}
   `;
@@ -320,11 +334,70 @@ function getRevisionPrompt(prompt: string, code: string) {
 }
 
 export async function getModels(
-  key: string,
-  apiEndpoint: string
-): Promise<Model[]> {
-  const openAi = getOpenAi(key, apiEndpoint);
-  const response = await openAi.listModels();
+  engineConfig: EngineConfig,
+): Promise<string[]> {
+  logger.debug('Requesting OpenAI models list...');
+  const openAi = getOpenAi(engineConfig);
+  const agent = getProxyAgent(engineConfig);
+  const response = await openAi.listModels({
+    httpAgent: agent,
+    httpsAgent: agent,
+  });
+  
+  const models = response.data.data
+    .filter((model: Model) => model.object === 'model')
+    .map((model: Model) => model.id);
+  
+  logger.debug(`Retrieved ${models.length} models`, { models });
+  return models;
+}
 
-  return response.data.data.filter((model) => model.object === 'model');
+export function createOpenAiEngine(
+  engineConfig: EngineConfig,
+): EngineApi {
+  return {
+    async getScriptAndInfo(params: { prompt: string }) {
+      return await getScriptAndInfo({
+        prompt: params.prompt,
+        engineConfig,
+      });
+    },
+
+    async generateCompletion(params: {
+      prompt: string | ChatMessage[];
+      number?: number;
+    }) {
+      return await generateCompletion({
+        prompt: params.prompt,
+        number: params.number,
+        engineConfig,
+      });
+    },
+
+    async getExplanation(params: { script: string }) {
+      return await getExplanation({
+        script: params.script,
+        engineConfig,
+      });
+    },
+
+    async getRevision(params: { prompt: string; code: string }) {
+      return await getRevision({
+        prompt: params.prompt,
+        code: params.code,
+        engineConfig,
+      });
+    },
+
+    readData(
+      iterableStream: AsyncGenerator<string, void>,
+      ...excluded: (RegExp | string | undefined)[]
+    ) {
+      return readData(iterableStream, ...excluded);
+    },
+
+    async getModels() {
+      return await getModels(engineConfig);
+    },
+  };
 }

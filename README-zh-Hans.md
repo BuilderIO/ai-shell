@@ -182,7 +182,7 @@ ai config
 │  ○ OpenAI Key
 │  ○ OpenAI API Endpoint
 │  ○ Silent Mode
-│  ● Model (gpt-4o-mini)
+│  ● Model (gpt-4.1-nano)
 │  ○ Language
 │  ○ Cancel
 └
