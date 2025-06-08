@@ -1,0 +1,72 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+## Project Structure
+
+1. **Main files:**
+   - `src/cli.ts` - Entry point of the CLI application, handles user commands
+   - `src/prompt.ts` - Responsible for the beautiful animated interface and response display
+
+2. **AI engines (`src/helpers/engines/`):**
+   - `engine-api.ts` - Abstract interface for all AI engines
+   - `engine-factory.ts` - Factory for creating AI engine instances
+   - `config-platform.ts` - Configuration for AI engines
+
+3. **Helper modules (`src/helpers/`):**
+   - `completion.ts` - **Key file!** Implementation of OpenAI API integration, response generation and processing (should be in `src/helpers/engines/`, but left here for better git-diff)
+   - `logger.ts` - Logging system with file rotation support and debug/info/error levels
+   - `config.ts` - Application settings and configuration management
+   - `error.ts` - Error handling and exceptions
+   - `i18n.ts` - Internationalization and interface translations
+   - `shell-history.ts` - Shell command history management
+   - `constants.ts` - Application constants
+   - `os-detect.ts` - Operating system and shell detection
+   - `stream-to-iterable.ts` - Utility for converting streams to iterable objects
+   - `stream-to-string.ts` - Utility for converting streams to strings
+   - `strip-regex-patterns.ts` - Utility for cleaning text from regex patterns
+   - `replace-all-polyfill.ts` - Polyfill for the replaceAll method
+
+4. **Commands (`src/commands/`):**
+   - `chat.ts` - Interactive AI chat implementation
+   - `config.ts` - Application configuration via CLI interface
+   - `update.ts` - Automatic application updates
+
+5. **Localization (`src/locales/`):**
+   - Translation files in JSON format for different languages:
+     - `en.json` - English
+     - `ru.json` - Russian  
+     - `de.json` - German
+     - `fr.json` - French
+     - `es.json` - Spanish
+     - `pt.json` - Portuguese
+     - `zh-Hans.json`, `zh-Hant.json` - Chinese (Simplified and Traditional)
+     - `jp.json` - Japanese
+     - `ko.json` - Korean
+     - `ar.json` - Arabic
+     - `tr.json` - Turkish
+     - `uk.json` - Ukrainian
+     - `vi.json` - Vietnamese
+     - `id.json` - Indonesian
+
+6. **Configuration files (project root):**
+   - `package.json` - Package description and npm dependencies
+   - `tsconfig.json` - TypeScript compiler settings
+   - `.eslintrc.cjs` - ESLint settings for code checking
+   - `.prettierrc.json` - Code formatting settings
+   - `.nvmrc` - Node.js version for the project
+
+7. **Documentation:**
+   - `README.md` - Main project documentation
+   - `README-zh-Hans.md` - Documentation in Chinese
+   - `CHANGELOG.md` - Version change list
+   - `CONTRIBUTING.md` - Contributor guide
+   - `GIGACHAT_TZ.md` - Technical specification for GigaChat integration
+   - `LICENSE` - Project license
+
+8. **Working directories:**
+   - `dist/` - Compiled files for production
+   - `logs/` - Application log files
+   - `node_modules/` - Installed npm dependencies
+   - `gigachat-js/` - Repository with source code of the module for working with GigaChat API

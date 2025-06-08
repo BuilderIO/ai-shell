@@ -1,17 +1,15 @@
 import * as p from '@clack/prompts';
 import { execaCommand } from 'execa';
 import { cyan, dim } from 'kolorist';
-import {
-  getExplanation,
-  getRevision,
-  getScriptAndInfo,
-} from './helpers/completion';
 import { getConfig } from './helpers/config';
 import { projectName } from './helpers/constants';
 import { KnownError } from './helpers/error';
 import clipboardy from 'clipboardy';
 import i18n from './helpers/i18n';
 import { appendToShellHistory } from './helpers/shell-history';
+import { EngineConfig } from './helpers/engines/config-engine';
+import { createEngine } from './helpers/engines/engine-factory';
+import { getEngineConfig } from './helpers/config';
 
 const init = async () => {
   try {
@@ -101,13 +99,9 @@ export async function prompt({
   usePrompt,
   silentMode,
 }: { usePrompt?: string; silentMode?: boolean } = {}) {
-  const {
-    OPENAI_KEY: key,
-    SILENT_MODE,
-    OPENAI_API_ENDPOINT: apiEndpoint,
-    MODEL: model,
-  } = await getConfig();
-  const skipCommandExplanation = silentMode || SILENT_MODE;
+  const config = await getConfig();
+  const engineConfig: EngineConfig = getEngineConfig(config);
+  const skipCommandExplanation = silentMode || config.SILENT_MODE;
 
   console.log('');
   p.intro(`${cyan(`${projectName}`)}`);
@@ -115,11 +109,9 @@ export async function prompt({
   const thePrompt = usePrompt || (await getPrompt());
   const spin = p.spinner();
   spin.start(i18n.t(`Loading...`));
-  const { readInfo, readScript } = await getScriptAndInfo({
+  const engine = createEngine(engineConfig);
+  const { readInfo, readScript } = await engine.getScriptAndInfo({
     prompt: thePrompt,
-    key,
-    model,
-    apiEndpoint,
   });
   spin.stop(`${i18n.t('Your script')}:`);
   console.log('');
@@ -131,11 +123,9 @@ export async function prompt({
     spin.start(i18n.t(`Getting explanation...`));
     const info = await readInfo(process.stdout.write.bind(process.stdout));
     if (!info) {
-      const { readExplanation } = await getExplanation({
+      const engine = createEngine(engineConfig);
+      const { readExplanation } = await engine.getExplanation({
         script,
-        key,
-        model,
-        apiEndpoint,
       });
       spin.stop(`${i18n.t('Explanation')}:`);
       console.log('');
@@ -146,15 +136,17 @@ export async function prompt({
     }
   }
 
-  await runOrReviseFlow(script, key, model, apiEndpoint, silentMode);
+  await runOrReviseFlow(
+    script,
+    engineConfig,
+    silentMode,
+  );
 }
 
 async function runOrReviseFlow(
   script: string,
-  key: string,
-  model: string,
-  apiEndpoint: string,
-  silentMode?: boolean
+  engineConfig: EngineConfig,
+  silentMode?: boolean,
 ) {
   const emptyScript = script.trim() === '';
 
@@ -191,7 +183,11 @@ async function runOrReviseFlow(
         label: '🔁 ' + i18n.t('Revise'),
         hint: i18n.t('Give feedback via prompt and get a new result'),
         value: async () => {
-          await revisionFlow(script, key, model, apiEndpoint, silentMode);
+          await revisionFlow(
+            script,
+            engineConfig,
+            silentMode,
+          );
         },
       },
       {
@@ -220,20 +216,16 @@ async function runOrReviseFlow(
 
 async function revisionFlow(
   currentScript: string,
-  key: string,
-  model: string,
-  apiEndpoint: string,
-  silentMode?: boolean
+  engineConfig: EngineConfig,
+  silentMode?: boolean,
 ) {
   const revision = await promptForRevision();
   const spin = p.spinner();
   spin.start(i18n.t(`Loading...`));
-  const { readScript } = await getRevision({
+  const engine = createEngine(engineConfig);
+  const { readScript } = await engine.getRevision({
     prompt: revision,
     code: currentScript,
-    key,
-    model,
-    apiEndpoint,
   });
   spin.stop(`${i18n.t(`Your new script`)}:`);
 
@@ -246,11 +238,9 @@ async function revisionFlow(
   if (!silentMode) {
     const infoSpin = p.spinner();
     infoSpin.start(i18n.t(`Getting explanation...`));
-    const { readExplanation } = await getExplanation({
+    const engine = createEngine(engineConfig);
+    const { readExplanation } = await engine.getExplanation({
       script,
-      key,
-      model,
-      apiEndpoint,
     });
 
     infoSpin.stop(`${i18n.t('Explanation')}:`);
@@ -261,7 +251,11 @@ async function revisionFlow(
     console.log(dim('•'));
   }
 
-  await runOrReviseFlow(script, key, model, apiEndpoint, silentMode);
+  await runOrReviseFlow(
+    script,
+    engineConfig,
+    silentMode,
+  );
 }
 
 export const parseAssert = (name: string, condition: any, message: string) => {

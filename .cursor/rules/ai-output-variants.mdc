@@ -1,0 +1,69 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+Examples of correct responses. Use these program responses as a reference to understand that it's working correctly.
+
+1.
+```
+> npx ai my ip
+
+┌  AI Shell
+│
+◇  Your script:
+│
+│  curl ipinfo.io/ip
+│
+◇  Explanation:
+│
+│  Request to a public service that returns your IP address.
+│
+◆  Run this script?
+│  ● ✅ Yes (Lets go!)
+│  ○ 📝 Revise
+│  ○ ❌ Cancel
+└
+```
+
+2.
+```
+> npx ai 'what is the weather in New York'
+
+┌  AI Shell
+│
+◇  Your script:
+│
+│  curl wttr.in/NewYork
+│
+◇  Explanation:
+│
+│  Popular weather service that prints weather in a beautiful format with ASCII graphics.
+│
+◆  Run this script?
+│  ● ✅ Yes (Lets go!)
+│  ○ 📝 Revise
+│  ○ ❌ Cancel
+└
+```
+
+3.
+```
+> npx ai find all log files
+
+┌  AI Shell
+│
+◇  Your script:
+│
+│  find . -type f -name '*.log'
+│
+◇  Explanation:
+│
+│  Searches for log files in the current directory
+│
+◆  Run this script?
+│  ● ✅ Yes (Lets go!)
+│  ○ 📝 Revise
+│  ○ ❌ Cancel
+└
+```

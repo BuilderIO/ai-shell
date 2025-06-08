@@ -13,10 +13,12 @@
     "clipboardy": "^2.3.0",
     "dedent": "^0.7.0",
     "execa": "^7.1.1",
+    "gigachat": "^0.0.14",
     "i18next": "^22.4.15",
     "ini": "^4.0.0",
     "kolorist": "^1.7.0",
-    "openai": "^3.2.1"
+    "openai": "^3.2.1",
+    "proxy-agent": "^6.5.0"
   },
   "repository": {
     "type": "git",

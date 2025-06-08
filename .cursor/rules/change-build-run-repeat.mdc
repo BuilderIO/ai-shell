@@ -1,0 +1,22 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+## Development Instructions (Always Apply)
+
+1. Install dependencies ($1): `npm install` - only if a new dependency was used and/or an old one was removed.
+2. Build ($2): `npm run build` - if code was changed and needs to be rebuilt.
+3. Run ($3): `npx ai 'description of what needs to be done'` - for functionality testing (for understanding how it should work, see `.cursor/rules/ai-output-variants.mdc`).
+4. Fix, log, debug, change dependencies ($1), rebuild ($2), and run ($3) as needed until the task is completed.
+
+p.s. For convenience, you can run commands ^2 and ^3 together using `$1 && $2` at once.
+
+## Additional (if required)
+
+Log ONLY using `src/helpers/logger.ts` (methods). Do not use `console.log`. Code snippets for use:
+- Import: `import { logger } from './logger';`
+- Call: `logger.debug(message: string, data?: any);` (as well as `info`, `error`)
+- See logs here: `./logs/ai-shell.log`
+
+If you need to understand the project structure, see `.cursor/rules/project-files-description.mdc`.

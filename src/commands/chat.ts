@@ -1,11 +1,13 @@
 import { command } from 'cleye';
 import { spinner, intro, outro, text, isCancel } from '@clack/prompts';
 import { cyan, green } from 'kolorist';
-import { generateCompletion, readData } from '../helpers/completion';
 import { getConfig } from '../helpers/config';
 import { streamToIterable } from '../helpers/stream-to-iterable';
-import { ChatCompletionRequestMessage } from 'openai';
+import { ChatMessage } from '../helpers/engines/engine-api';
 import i18n from '../helpers/i18n';
+import { EngineConfig } from '../helpers/engines/config-engine';
+import { createEngine } from '../helpers/engines/engine-factory';
+import { getEngineConfig } from '../helpers/config';
 
 export default command(
   {
@@ -16,12 +18,9 @@ export default command(
     },
   },
   async () => {
-    const {
-      OPENAI_KEY: key,
-      OPENAI_API_ENDPOINT: apiEndpoint,
-      MODEL: model,
-    } = await getConfig();
-    const chatHistory: ChatCompletionRequestMessage[] = [];
+    const config = await getConfig();
+    const engineConfig = getEngineConfig(config);
+    const chatHistory: ChatMessage[] = [];
 
     console.log('');
     intro(i18n.t('Starting new conversation'));
@@ -48,9 +47,7 @@ export default command(
       });
       const { readResponse } = await getResponse({
         prompt: chatHistory,
-        key,
-        model,
-        apiEndpoint,
+        engineConfig,
       });
 
       infoSpin.stop(`${green('AI Shell:')}`);
@@ -74,25 +71,19 @@ export default command(
 async function getResponse({
   prompt,
   number = 1,
-  key,
-  model,
-  apiEndpoint,
+  engineConfig,
 }: {
-  prompt: string | ChatCompletionRequestMessage[];
+  prompt: string | ChatMessage[];
   number?: number;
-  model?: string;
-  key: string;
-  apiEndpoint: string;
+  engineConfig: EngineConfig;
 }) {
-  const stream = await generateCompletion({
+  const engine = createEngine(engineConfig);
+  const stream = await engine.generateCompletion({
     prompt,
-    key,
-    model,
     number,
-    apiEndpoint,
   });
 
   const iterableStream = streamToIterable(stream);
 
-  return { readResponse: readData(iterableStream) };
+  return { readResponse: engine.readData(iterableStream) };
 }
