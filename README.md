@@ -22,6 +22,18 @@
 
 <br>
 
+<p align="center">
+   <!-- Keep these links. Translations will automatically update with the README. -->
+   <a href="https://www.readme-i18n.com/BuilderIO/ai-shell?lang=de">Deutsch</a> | 
+   <a href="https://www.readme-i18n.com/BuilderIO/ai-shell?lang=es">Español</a> | 
+   <a href="https://www.readme-i18n.com/BuilderIO/ai-shell?lang=fr">français</a> | 
+   <a href="https://www.readme-i18n.com/BuilderIO/ai-shell?lang=ja">日本語</a> | 
+   <a href="https://www.readme-i18n.com/BuilderIO/ai-shell?lang=ko">한국어</a> | 
+   <a href="https://www.readme-i18n.com/BuilderIO/ai-shell?lang=pt">Português</a> | 
+   <a href="https://www.readme-i18n.com/BuilderIO/ai-shell?lang=ru">Русский</a> | 
+   <a href="https://www.readme-i18n.com/BuilderIO/ai-shell?lang=zh">中文</a>
+</p>
+
 # AI Shell
 
 ## Setup
