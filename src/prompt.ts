@@ -1,5 +1,5 @@
 import * as p from '@clack/prompts';
-import { execaCommand } from 'execa';
+import { execa } from 'execa';
 import { cyan, dim } from 'kolorist';
 import {
   getExplanation,
@@ -40,9 +40,16 @@ async function runScript(script: string) {
   p.outro(`${i18n.t('Running')}: ${script}`);
   console.log('');
   try {
-    await execaCommand(script, {
+    const shell =
+      process.platform === 'win32'
+        ? process.env.ComSpec || process.env.COMSPEC || 'cmd.exe'
+        : process.env.SHELL || '/bin/sh';
+    const shellArgs =
+      process.platform === 'win32' ? ['/d', '/s', '/c', script] : ['-c', script];
+
+    // Use an explicit shell process so Node does not emit DEP0190 for shell=true.
+    await execa(shell, shellArgs, {
       stdio: 'inherit',
-      shell: process.env.SHELL || true,
     });
     appendToShellHistory(script);
   } catch (error) {
