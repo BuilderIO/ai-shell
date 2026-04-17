@@ -29,6 +29,51 @@ function getOpenAi(key: string, apiEndpoint: string) {
 // a github style like: "```bash"
 const shellCodeExclusions = [/```[a-zA-Z]*\n/gi, /```[a-zA-Z]*/gi, '\n'];
 
+export function extractCommandFromBuffer(
+  buffer: string,
+  finalize = false
+): string | null {
+  const trimmed = buffer.replace(/^\s+/, '');
+  if (!trimmed) {
+    return finalize ? '' : null;
+  }
+
+  if (/^`{1,2}$/.test(trimmed) && !finalize) {
+    return null;
+  }
+
+  if (trimmed.startsWith('```')) {
+    const afterFence = trimmed.slice(3);
+    const languageMatch = afterFence.match(/^[a-zA-Z0-9_-]*\r?\n/);
+
+    if (!languageMatch && /^[a-zA-Z0-9_-]*$/.test(afterFence) && !finalize) {
+      return null;
+    }
+
+    const bodyStart = 3 + (languageMatch?.[0].length ?? 0);
+    const body = trimmed.slice(bodyStart);
+    const closingFenceIndex = body.indexOf('```');
+
+    if (closingFenceIndex >= 0) {
+      return body.slice(0, closingFenceIndex).trim();
+    }
+
+    return finalize ? body.trim() : null;
+  }
+
+  const newlineIndex = trimmed.search(/\r?\n/);
+  const closingFenceIndex = trimmed.indexOf('```');
+  const stopIndex = [newlineIndex, closingFenceIndex]
+    .filter((index) => index >= 0)
+    .sort((left, right) => left - right)[0];
+
+  if (stopIndex !== undefined) {
+    return trimmed.slice(0, stopIndex).trim();
+  }
+
+  return finalize ? trimmed.trim() : null;
+}
+
 export async function getScriptAndInfo({
   prompt,
   key,
@@ -193,6 +238,7 @@ export const readData =
   ) =>
   (writer: (data: string) => void): Promise<string> =>
     new Promise(async (resolve) => {
+      const isScriptRead = excluded.length > 0;
       let stopTextStream = false;
       let data = '';
       let content = '';
@@ -217,6 +263,12 @@ export const readData =
         const payloads = chunk.toString().split('\n\n');
         for (const payload of payloads) {
           if (payload.includes('[DONE]') || stopTextStream) {
+            if (isScriptRead) {
+              const parsed = extractCommandFromBuffer(buffer, true) ?? '';
+              writer(parsed);
+              resolve(parsed);
+              return;
+            }
             dataStart = false;
             resolve(data);
             return;
@@ -224,6 +276,22 @@ export const readData =
 
           if (payload.startsWith('data:')) {
             content = parseContent(payload);
+            if (isScriptRead) {
+              if (!content) {
+                continue;
+              }
+
+              buffer += content;
+              const parsed = extractCommandFromBuffer(buffer);
+              if (parsed === null) {
+                continue;
+              }
+
+              writer(parsed);
+              resolve(parsed);
+              return;
+            }
+
             // Use buffer only for start detection
             if (!dataStart) {
               // Append content to the buffer
