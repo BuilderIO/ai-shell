@@ -2,11 +2,38 @@ import os from 'os';
 import path from 'path';
 import i18n from './i18n';
 
+export function detectWindowsShell(env = process.env): string {
+  const shell = env.SHELL;
+  if (shell) {
+    return path
+      .basename(shell)
+      .replace(/\.exe$/i, '')
+      .toLowerCase();
+  }
+
+  const comSpec = env.ComSpec;
+  if (comSpec) {
+    const shellName = path
+      .basename(comSpec)
+      .replace(/\.exe$/i, '')
+      .toLowerCase();
+    if (
+      shellName === 'cmd' ||
+      shellName === 'powershell' ||
+      shellName === 'pwsh'
+    ) {
+      return shellName;
+    }
+  }
+
+  return 'powershell';
+}
+
 export function detectShell() {
   try {
-    // Detect if we're running on win32 and assume powershell
+    // Detect Windows shells from environment first, instead of assuming PowerShell.
     if (os.platform() === 'win32') {
-      return 'powershell';
+      return detectWindowsShell();
     }
     // otherwise return current shell; default to bash
     return path.basename(os.userInfo().shell ?? 'bash');
