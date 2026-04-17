@@ -198,8 +198,18 @@ async function runOrReviseFlow(
         label: '📋 ' + i18n.t('Copy'),
         hint: i18n.t('Copy the generated script to your clipboard'),
         value: async () => {
-          await clipboardy.write(script);
-          p.outro(i18n.t('Copied to clipboard!'));
+          try {
+            await clipboardy.write(script);
+            p.outro(i18n.t('Copied to clipboard!'));
+          } catch (error) {
+            const message =
+              error instanceof Error ? error.message : String(error);
+            p.outro(
+              `${i18n.t(
+                'Clipboard unavailable. Copy the script manually.'
+              )}\n\n${message}`
+            );
+          }
         },
       },
       {
