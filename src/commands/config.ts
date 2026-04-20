@@ -9,6 +9,21 @@ import {
 import { KnownError, handleCliError } from '../helpers/error.js';
 import i18n from '../helpers/i18n.js';
 
+const parseConfigAssignment = (keyValue: string): [string, string] => {
+  const separatorIndex = keyValue.indexOf('=');
+
+  if (separatorIndex <= 0) {
+    throw new KnownError(
+      `${i18n.t('Missing required parameter')} "key=value"`
+    );
+  }
+
+  return [
+    keyValue.slice(0, separatorIndex),
+    keyValue.slice(separatorIndex + 1),
+  ];
+};
+
 export default command(
   {
     name: 'config',
@@ -51,9 +66,7 @@ export default command(
       }
 
       if (mode === 'set') {
-        await setConfigs(
-          keyValues.map((keyValue) => keyValue.split('=') as [string, string])
-        );
+        await setConfigs(keyValues.map(parseConfigAssignment));
         return;
       }
 
