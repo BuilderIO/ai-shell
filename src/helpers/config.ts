@@ -66,6 +66,8 @@ type ValidConfig = {
   [Key in ConfigKeys]: ReturnType<(typeof configParsers)[Key]>;
 };
 
+type ConfigSnapshot = Partial<ValidConfig>;
+
 const configPath = path.join(os.homedir(), '.ai-shell');
 
 const fileExists = (filePath: string) =>
@@ -99,6 +101,26 @@ export const getConfig = async (
   return parsedConfig as ValidConfig;
 };
 
+export const getConfigSnapshot = async (
+  cliConfig?: RawConfig
+): Promise<ConfigSnapshot> => {
+  const config = await readConfigFile();
+  const parsedConfig: Partial<Record<ConfigKeys, unknown>> = {};
+
+  for (const key of Object.keys(configParsers) as ConfigKeys[]) {
+    const parser = configParsers[key];
+    const value = cliConfig?.[key] ?? config[key];
+
+    if (key === 'OPENAI_KEY' && !value) {
+      continue;
+    }
+
+    parsedConfig[key] = parser(value);
+  }
+
+  return parsedConfig as ConfigSnapshot;
+};
+
 export const setConfigs = async (keyValues: [key: string, value: string][]) => {
   const config = await readConfigFile();
 
@@ -116,14 +138,14 @@ export const setConfigs = async (keyValues: [key: string, value: string][]) => {
 
 export const showConfigUI = async () => {
   try {
-    const config = await getConfig();
+    const config = await getConfigSnapshot();
     const choice = (await p.select({
       message: i18n.t('Set config') + ':',
       options: [
         {
           label: i18n.t('OpenAI Key'),
           value: 'OPENAI_KEY',
-          hint: hasOwn(config, 'OPENAI_KEY')
+          hint: config.OPENAI_KEY
             ? // Obfuscate the key
               'sk-...' + config.OPENAI_KEY.slice(-3)
             : i18n.t('(not set)'),
@@ -138,7 +160,7 @@ export const showConfigUI = async () => {
         {
           label: i18n.t('Silent Mode'),
           value: 'SILENT_MODE',
-          hint: hasOwn(config, 'SILENT_MODE')
+          hint: config.SILENT_MODE !== undefined
             ? config.SILENT_MODE.toString()
             : i18n.t('(not set)'),
         },
