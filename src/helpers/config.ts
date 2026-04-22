@@ -51,6 +51,9 @@ const configParsers = {
   OPENAI_API_ENDPOINT(apiEndpoint?: string) {
     return apiEndpoint || 'https://api.openai.com/v1';
   },
+  AZURE_OPENAI_DEPLOYMENT(deployment?: string) {
+    return deployment || '';
+  },
   LANGUAGE(language?: string) {
     return language || 'en';
   },
@@ -136,6 +139,14 @@ export const showConfigUI = async () => {
             : i18n.t('(not set)'),
         },
         {
+          label: 'Azure OpenAI Deployment',
+          value: 'AZURE_OPENAI_DEPLOYMENT',
+          hint: hasOwn(config, 'AZURE_OPENAI_DEPLOYMENT') &&
+            config.AZURE_OPENAI_DEPLOYMENT
+            ? config.AZURE_OPENAI_DEPLOYMENT
+            : i18n.t('(not set)'),
+        },
+        {
           label: i18n.t('Silent Mode'),
           value: 'SILENT_MODE',
           hint: hasOwn(config, 'SILENT_MODE')
@@ -181,6 +192,12 @@ export const showConfigUI = async () => {
       });
       if (p.isCancel(apiEndpoint)) return;
       await setConfigs([['OPENAI_API_ENDPOINT', apiEndpoint]]);
+    } else if (choice === 'AZURE_OPENAI_DEPLOYMENT') {
+      const deploymentId = await p.text({
+        message: 'Enter your Azure OpenAI deployment ID',
+      });
+      if (p.isCancel(deploymentId)) return;
+      await setConfigs([['AZURE_OPENAI_DEPLOYMENT', deploymentId]]);
     } else if (choice === 'SILENT_MODE') {
       const silentMode = await p.confirm({
         message: i18n.t('Enable silent mode?'),
@@ -188,9 +205,13 @@ export const showConfigUI = async () => {
       if (p.isCancel(silentMode)) return;
       await setConfigs([['SILENT_MODE', silentMode ? 'true' : 'false']]);
     } else if (choice === 'MODEL') {
-      const { OPENAI_KEY: key, OPENAI_API_ENDPOINT: apiEndpoint } =
+      const {
+        OPENAI_KEY: key,
+        OPENAI_API_ENDPOINT: apiEndpoint,
+        AZURE_OPENAI_DEPLOYMENT: azureDeployment,
+      } =
         await getConfig();
-      const models = await getModels(key, apiEndpoint);
+      const models = await getModels(key, apiEndpoint, azureDeployment);
       const model = (await p.select({
         message: 'Pick a model.',
         options: models.map((m: Model) => {

@@ -19,6 +19,7 @@ export default command(
     const {
       OPENAI_KEY: key,
       OPENAI_API_ENDPOINT: apiEndpoint,
+      AZURE_OPENAI_DEPLOYMENT: azureDeployment,
       MODEL: model,
     } = await getConfig();
     const chatHistory: ChatCompletionRequestMessage[] = [];
@@ -51,6 +52,7 @@ export default command(
         key,
         model,
         apiEndpoint,
+        azureDeployment,
       });
 
       infoSpin.stop(`${green('AI Shell:')}`);
@@ -77,12 +79,14 @@ async function getResponse({
   key,
   model,
   apiEndpoint,
+  azureDeployment,
 }: {
   prompt: string | ChatCompletionRequestMessage[];
   number?: number;
   model?: string;
   key: string;
   apiEndpoint: string;
+  azureDeployment?: string;
 }) {
   const stream = await generateCompletion({
     prompt,
@@ -90,6 +94,7 @@ async function getResponse({
     model,
     number,
     apiEndpoint,
+    azureDeployment,
   });
 
   const iterableStream = streamToIterable(stream);

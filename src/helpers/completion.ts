@@ -4,6 +4,7 @@ import {
   ChatCompletionRequestMessage,
   Model,
 } from 'openai';
+import axios from 'axios';
 import dedent from 'dedent';
 import { IncomingMessage } from 'http';
 import { KnownError } from './error';
@@ -25,6 +26,63 @@ function getOpenAi(key: string, apiEndpoint: string) {
   return openAi;
 }
 
+function isAzureOpenAIEndpoint(apiEndpoint: string) {
+  return /\.openai\.azure\.com(?:\/|$)/i.test(apiEndpoint);
+}
+
+function normalizeAzureEndpoint(apiEndpoint: string) {
+  return apiEndpoint.replace(/\/+$/, '');
+}
+
+async function createAzureChatCompletion({
+  prompt,
+  number,
+  key,
+  model,
+  apiEndpoint,
+  azureDeployment,
+}: {
+  prompt: string | ChatCompletionRequestMessage[];
+  number: number;
+  model?: string;
+  key: string;
+  apiEndpoint: string;
+  azureDeployment?: string;
+}) {
+  const deploymentId = azureDeployment?.trim();
+  if (!deploymentId) {
+    throw new KnownError(
+      'Azure OpenAI requires AZURE_OPENAI_DEPLOYMENT. Set it with `ai config set AZURE_OPENAI_DEPLOYMENT=<your-deployment-id>`.'
+    );
+  }
+
+  const response = await axios.post(
+    `${normalizeAzureEndpoint(
+      apiEndpoint
+    )}/openai/deployments/${deploymentId}/chat/completions`,
+    {
+      messages: Array.isArray(prompt)
+        ? prompt
+        : [{ role: 'user', content: prompt }],
+      n: Math.min(number, 10),
+      stream: true,
+      ...(model ? { model } : {}),
+    },
+    {
+      responseType: 'stream',
+      headers: {
+        'api-key': key,
+        'Content-Type': 'application/json',
+      },
+      params: {
+        'api-version': '2024-02-15-preview',
+      },
+    }
+  );
+
+  return response.data as IncomingMessage;
+}
+
 // Openai outputs markdown format for code blocks. It oftne uses
 // a github style like: "```bash"
 const shellCodeExclusions = [/```[a-zA-Z]*\n/gi, /```[a-zA-Z]*/gi, '\n'];
@@ -34,11 +92,13 @@ export async function getScriptAndInfo({
   key,
   model,
   apiEndpoint,
+  azureDeployment,
 }: {
   prompt: string;
   key: string;
   model?: string;
   apiEndpoint: string;
+  azureDeployment?: string;
 }) {
   const fullPrompt = getFullPrompt(prompt);
   const stream = await generateCompletion({
@@ -47,6 +107,7 @@ export async function getScriptAndInfo({
     key,
     model,
     apiEndpoint,
+    azureDeployment,
   });
   const iterableStream = streamToIterable(stream);
   return {
@@ -61,13 +122,26 @@ export async function generateCompletion({
   key,
   model,
   apiEndpoint,
+  azureDeployment,
 }: {
   prompt: string | ChatCompletionRequestMessage[];
   number?: number;
   model?: string;
   key: string;
   apiEndpoint: string;
+  azureDeployment?: string;
 }) {
+  if (isAzureOpenAIEndpoint(apiEndpoint)) {
+    return createAzureChatCompletion({
+      prompt,
+      number,
+      key,
+      model,
+      apiEndpoint,
+      azureDeployment,
+    });
+  }
+
   const openAi = getOpenAi(key, apiEndpoint);
   try {
     const completion = await openAi.createChatCompletion(
@@ -141,11 +215,13 @@ export async function getExplanation({
   key,
   model,
   apiEndpoint,
+  azureDeployment,
 }: {
   script: string;
   key: string;
   model?: string;
   apiEndpoint: string;
+  azureDeployment?: string;
 }) {
   const prompt = getExplanationPrompt(script);
   const stream = await generateCompletion({
@@ -154,6 +230,7 @@ export async function getExplanation({
     number: 1,
     model,
     apiEndpoint,
+    azureDeployment,
   });
   const iterableStream = streamToIterable(stream);
   return { readExplanation: readData(iterableStream) };
@@ -165,12 +242,14 @@ export async function getRevision({
   key,
   model,
   apiEndpoint,
+  azureDeployment,
 }: {
   prompt: string;
   code: string;
   key: string;
   model?: string;
   apiEndpoint: string;
+  azureDeployment?: string;
 }) {
   const fullPrompt = getRevisionPrompt(prompt, code);
   const stream = await generateCompletion({
@@ -179,6 +258,7 @@ export async function getRevision({
     number: 1,
     model,
     apiEndpoint,
+    azureDeployment,
   });
   const iterableStream = streamToIterable(stream);
   return {
@@ -321,8 +401,27 @@ function getRevisionPrompt(prompt: string, code: string) {
 
 export async function getModels(
   key: string,
-  apiEndpoint: string
+  apiEndpoint: string,
+  azureDeployment?: string
 ): Promise<Model[]> {
+  if (isAzureOpenAIEndpoint(apiEndpoint)) {
+    const deploymentId = azureDeployment?.trim();
+    if (!deploymentId) {
+      throw new KnownError(
+        'Azure OpenAI requires AZURE_OPENAI_DEPLOYMENT. Set it with `ai config set AZURE_OPENAI_DEPLOYMENT=<your-deployment-id>`.'
+      );
+    }
+
+    return [
+      {
+        id: deploymentId,
+        object: 'model',
+        created: 0,
+        owned_by: 'azure-openai',
+      } as Model,
+    ];
+  }
+
   const openAi = getOpenAi(key, apiEndpoint);
   const response = await openAi.listModels();
 
