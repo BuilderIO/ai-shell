@@ -66,6 +66,10 @@ type ValidConfig = {
   [Key in ConfigKeys]: ReturnType<(typeof configParsers)[Key]>;
 };
 
+type UIConfig = Omit<ValidConfig, 'OPENAI_KEY'> & {
+  OPENAI_KEY?: string;
+};
+
 const configPath = path.join(os.homedir(), '.ai-shell');
 
 const fileExists = (filePath: string) =>
@@ -84,20 +88,36 @@ const readConfigFile = async (): Promise<RawConfig> => {
   return ini.parse(configString);
 };
 
-export const getConfig = async (
-  cliConfig?: RawConfig
-): Promise<ValidConfig> => {
+const parseConfig = async <T extends ValidConfig | UIConfig>(
+  cliConfig: RawConfig | undefined,
+  options: { requireOpenAIKey: boolean }
+): Promise<T> => {
   const config = await readConfigFile();
   const parsedConfig: Record<string, unknown> = {};
 
   for (const key of Object.keys(configParsers) as ConfigKeys[]) {
     const parser = configParsers[key];
     const value = cliConfig?.[key] ?? config[key];
+
+    if (key === 'OPENAI_KEY' && !options.requireOpenAIKey) {
+      parsedConfig[key] = value;
+      continue;
+    }
+
     parsedConfig[key] = parser(value);
   }
 
-  return parsedConfig as ValidConfig;
+  return parsedConfig as T;
 };
+
+export const getConfig = async (
+  cliConfig?: RawConfig
+): Promise<ValidConfig> => parseConfig<ValidConfig>(cliConfig, {
+  requireOpenAIKey: true,
+});
+
+export const getUIConfig = async (cliConfig?: RawConfig): Promise<UIConfig> =>
+  parseConfig<UIConfig>(cliConfig, { requireOpenAIKey: false });
 
 export const setConfigs = async (keyValues: [key: string, value: string][]) => {
   const config = await readConfigFile();
@@ -116,7 +136,7 @@ export const setConfigs = async (keyValues: [key: string, value: string][]) => {
 
 export const showConfigUI = async () => {
   try {
-    const config = await getConfig();
+    const config = await getUIConfig();
     const choice = (await p.select({
       message: i18n.t('Set config') + ':',
       options: [
