@@ -105,6 +105,7 @@ export async function prompt({
     OPENAI_KEY: key,
     SILENT_MODE,
     OPENAI_API_ENDPOINT: apiEndpoint,
+    AZURE_OPENAI_DEPLOYMENT: azureDeployment,
     MODEL: model,
   } = await getConfig();
   const skipCommandExplanation = silentMode || SILENT_MODE;
@@ -120,6 +121,7 @@ export async function prompt({
     key,
     model,
     apiEndpoint,
+    azureDeployment,
   });
   spin.stop(`${i18n.t('Your script')}:`);
   console.log('');
@@ -136,6 +138,7 @@ export async function prompt({
         key,
         model,
         apiEndpoint,
+        azureDeployment,
       });
       spin.stop(`${i18n.t('Explanation')}:`);
       console.log('');
@@ -146,7 +149,14 @@ export async function prompt({
     }
   }
 
-  await runOrReviseFlow(script, key, model, apiEndpoint, silentMode);
+  await runOrReviseFlow(
+    script,
+    key,
+    model,
+    apiEndpoint,
+    azureDeployment,
+    silentMode
+  );
 }
 
 async function runOrReviseFlow(
@@ -154,6 +164,7 @@ async function runOrReviseFlow(
   key: string,
   model: string,
   apiEndpoint: string,
+  azureDeployment: string,
   silentMode?: boolean
 ) {
   const emptyScript = script.trim() === '';
@@ -191,7 +202,14 @@ async function runOrReviseFlow(
         label: '🔁 ' + i18n.t('Revise'),
         hint: i18n.t('Give feedback via prompt and get a new result'),
         value: async () => {
-          await revisionFlow(script, key, model, apiEndpoint, silentMode);
+          await revisionFlow(
+            script,
+            key,
+            model,
+            apiEndpoint,
+            azureDeployment,
+            silentMode
+          );
         },
       },
       {
@@ -223,6 +241,7 @@ async function revisionFlow(
   key: string,
   model: string,
   apiEndpoint: string,
+  azureDeployment: string,
   silentMode?: boolean
 ) {
   const revision = await promptForRevision();
@@ -234,6 +253,7 @@ async function revisionFlow(
     key,
     model,
     apiEndpoint,
+    azureDeployment,
   });
   spin.stop(`${i18n.t(`Your new script`)}:`);
 
@@ -251,6 +271,7 @@ async function revisionFlow(
       key,
       model,
       apiEndpoint,
+      azureDeployment,
     });
 
     infoSpin.stop(`${i18n.t('Explanation')}:`);
@@ -261,7 +282,14 @@ async function revisionFlow(
     console.log(dim('•'));
   }
 
-  await runOrReviseFlow(script, key, model, apiEndpoint, silentMode);
+  await runOrReviseFlow(
+    script,
+    key,
+    model,
+    apiEndpoint,
+    azureDeployment,
+    silentMode
+  );
 }
 
 export const parseAssert = (name: string, condition: any, message: string) => {
