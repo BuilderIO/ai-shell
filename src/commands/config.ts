@@ -3,6 +3,7 @@ import { red } from 'kolorist';
 import {
   hasOwn,
   getConfig,
+  getUIConfig,
   setConfigs,
   showConfigUI,
 } from '../helpers/config.js';
@@ -37,7 +38,7 @@ export default command(
       }
 
       if (mode === 'get') {
-        const config = await getConfig();
+        const config = await getUIConfig();
         for (const key of keyValues) {
           if (hasOwn(config, key)) {
             console.log(`${key}=${config[key as keyof typeof config]}`);
