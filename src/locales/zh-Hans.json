@@ -45,6 +45,8 @@
   "Cancel": "取消",
   "Exit the program": "退出程序",
   "Running": "正在运行",
+  "Clipboard unavailable. Copy the script manually:": "剪贴板不可用，请手动复制脚本：",
+  "Clipboard copy failed; script printed for manual copy.": "复制到剪贴板失败，已打印脚本供手动复制。",
   "Copied to clipboard!": "已复制到剪贴板！",
   "Your new script": "您的新脚本",
   "Invalid config property": "无效的配置属性",

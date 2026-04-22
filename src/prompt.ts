@@ -36,6 +36,20 @@ const sample = <T>(arr: T[]): T | undefined => {
   return len ? arr[Math.floor(Math.random() * len)] : undefined;
 };
 
+export async function copyScriptWithFallback(
+  script: string,
+  writeClipboard: (value: string) => Promise<void> = clipboardy.write,
+  ui: { note: typeof p.note; outro: typeof p.outro } = { note: p.note, outro: p.outro }
+) {
+  try {
+    await writeClipboard(script);
+    ui.outro(i18n.t('Copied to clipboard!'));
+  } catch (_error) {
+    ui.note(script, i18n.t('Clipboard unavailable. Copy the script manually:'));
+    ui.outro(i18n.t('Clipboard copy failed; script printed for manual copy.'));
+  }
+}
+
 async function runScript(script: string) {
   p.outro(`${i18n.t('Running')}: ${script}`);
   console.log('');
@@ -198,8 +212,7 @@ async function runOrReviseFlow(
         label: '📋 ' + i18n.t('Copy'),
         hint: i18n.t('Copy the generated script to your clipboard'),
         value: async () => {
-          await clipboardy.write(script);
-          p.outro(i18n.t('Copied to clipboard!'));
+          await copyScriptWithFallback(script);
         },
       },
       {
