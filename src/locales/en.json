@@ -45,6 +45,8 @@
   "Cancel": "Cancel",
   "Exit the program": "Exit the program",
   "Running": "Running",
+  "Clipboard unavailable. Copy the script manually:": "Clipboard unavailable. Copy the script manually:",
+  "Clipboard copy failed; script printed for manual copy.": "Clipboard copy failed; script printed for manual copy.",
   "Copied to clipboard!": "Copied to clipboard!",
   "Your new script": "Your new script",
   "Invalid config property": "Invalid config property",
