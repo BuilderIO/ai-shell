@@ -20,6 +20,22 @@ const languagesOptions = Object.entries(i18n.languages).map(([key, value]) => ({
   label: value,
 }));
 
+const getModelOptions = (models: Model[]) =>
+  models
+    .map((model) => model.id)
+    .filter((id): id is string => typeof id === 'string' && id.length > 0)
+    .map((id) => ({ value: id, label: id }));
+
+const promptForModelId = async () =>
+  p.text({
+    message: i18n.t('Enter the model id'),
+    validate: (value) => {
+      if (!value.length) {
+        return i18n.t('Please enter a model id');
+      }
+    },
+  });
+
 const parseAssert = (name: string, condition: any, message: string) => {
   if (!condition) {
     throw new KnownError(
@@ -191,12 +207,15 @@ export const showConfigUI = async () => {
       const { OPENAI_KEY: key, OPENAI_API_ENDPOINT: apiEndpoint } =
         await getConfig();
       const models = await getModels(key, apiEndpoint);
-      const model = (await p.select({
-        message: 'Pick a model.',
-        options: models.map((m: Model) => {
-          return { value: m.id, label: m.id };
-        }),
-      })) as string;
+      const modelOptions = getModelOptions(models);
+      const model = (
+        modelOptions.length > 0
+          ? await p.select({
+              message: 'Pick a model.',
+              options: modelOptions,
+            })
+          : await promptForModelId()
+      ) as string | symbol;
 
       if (p.isCancel(model)) return;
       await setConfigs([['MODEL', model]]);
