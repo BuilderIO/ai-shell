@@ -9,7 +9,6 @@ import * as p from '@clack/prompts';
 import { red } from 'kolorist';
 import i18n from './i18n';
 import { getModels } from './completion';
-import { Model } from 'openai';
 
 const { hasOwnProperty } = Object.prototype;
 export const hasOwn = (object: unknown, key: PropertyKey) =>
@@ -83,6 +82,37 @@ const readConfigFile = async (): Promise<RawConfig> => {
   const configString = await fs.readFile(configPath, 'utf8');
   return ini.parse(configString);
 };
+
+export const normalizeModelOptions = (models: Array<{ id?: string | null }> = []) =>
+  models
+    .map((model) => model.id?.trim())
+    .filter((id): id is string => Boolean(id))
+    .map((id) => ({ value: id, label: id }));
+
+export async function pickModelWithFallback(
+  key: string,
+  apiEndpoint: string,
+  ui: { select: typeof p.select; text: typeof p.text } = { select: p.select, text: p.text }
+) {
+  const models = await getModels(key, apiEndpoint);
+  const options = normalizeModelOptions(models);
+
+  if (options.length === 0) {
+    return ui.text({
+      message: i18n.t('Enter a model id'),
+      validate: (value) => {
+        if (!value.length) {
+          return i18n.t('Please enter a model id');
+        }
+      },
+    });
+  }
+
+  return ui.select({
+    message: 'Pick a model.',
+    options,
+  }) as Promise<string | symbol>;
+}
 
 export const getConfig = async (
   cliConfig?: RawConfig
@@ -190,13 +220,7 @@ export const showConfigUI = async () => {
     } else if (choice === 'MODEL') {
       const { OPENAI_KEY: key, OPENAI_API_ENDPOINT: apiEndpoint } =
         await getConfig();
-      const models = await getModels(key, apiEndpoint);
-      const model = (await p.select({
-        message: 'Pick a model.',
-        options: models.map((m: Model) => {
-          return { value: m.id, label: m.id };
-        }),
-      })) as string;
+      const model = await pickModelWithFallback(key, apiEndpoint);
 
       if (p.isCancel(model)) return;
       await setConfigs([['MODEL', model]]);

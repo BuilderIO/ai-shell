@@ -11,6 +11,8 @@
   "OpenAI Key": "OpenAI Key",
   "Please enter a key": "Please enter a key",
   "OpenAI API Endpoint": "OpenAI API Endpoint",
+  "Enter a model id": "Enter a model id",
+  "Please enter a model id": "Please enter a model id",
   "Enter your OpenAI API Endpoint": "Enter your OpenAI API Endpoint",
   "Silent Mode": "Silent Mode",
   "Enable silent mode?": "Enable silent mode?",
