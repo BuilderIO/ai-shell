@@ -11,6 +11,8 @@
   "OpenAI Key": "OpenAI 密鑰",
   "Please enter a key": "請輸入密鑰",
   "OpenAI API Endpoint": "OpenAI API 端點",
+  "Enter a model id": "輸入 model id",
+  "Please enter a model id": "請輸入 model id",
   "Enter your OpenAI API Endpoint": "輸入您的 OpenAI API 端點",
   "Silent Mode": "靜默模式",
   "Enable silent mode?": "啟用靜默模式？",
