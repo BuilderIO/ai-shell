@@ -236,8 +236,18 @@ export const readData =
               buffer += content;
               if (buffer.match(excludedPrefix ?? '')) {
                 dataStart = true;
-                // Clear the buffer once it has served its purpose
+                // Extract content after the code block start marker
+                const afterMatch = excludedPrefix
+                  ? buffer.replace(excludedPrefix, '')
+                  : '';
                 buffer = '';
+                if (afterMatch) {
+                  const cleaned = stripRegexPatterns(afterMatch, excluded);
+                  if (cleaned) {
+                    data += cleaned;
+                    writer(cleaned);
+                  }
+                }
                 if (excludedPrefix) break;
               }
             }
