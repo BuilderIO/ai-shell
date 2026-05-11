@@ -115,7 +115,7 @@ export async function prompt({
   const thePrompt = usePrompt || (await getPrompt());
   const spin = p.spinner();
   spin.start(i18n.t(`Loading...`));
-  const { readInfo, readScript } = await getScriptAndInfo({
+  const { readScript } = await getScriptAndInfo({
     prompt: thePrompt,
     key,
     model,
@@ -129,21 +129,18 @@ export async function prompt({
   console.log(dim('•'));
   if (!skipCommandExplanation) {
     spin.start(i18n.t(`Getting explanation...`));
-    const info = await readInfo(process.stdout.write.bind(process.stdout));
-    if (!info) {
-      const { readExplanation } = await getExplanation({
-        script,
-        key,
-        model,
-        apiEndpoint,
-      });
-      spin.stop(`${i18n.t('Explanation')}:`);
-      console.log('');
-      await readExplanation(process.stdout.write.bind(process.stdout));
-      console.log('');
-      console.log('');
-      console.log(dim('•'));
-    }
+    const { readExplanation } = await getExplanation({
+      script,
+      key,
+      model,
+      apiEndpoint,
+    });
+    spin.stop(`${i18n.t('Explanation')}:`);
+    console.log('');
+    await readExplanation(process.stdout.write.bind(process.stdout));
+    console.log('');
+    console.log('');
+    console.log(dim('•'));
   }
 
   await runOrReviseFlow(script, key, model, apiEndpoint, silentMode);

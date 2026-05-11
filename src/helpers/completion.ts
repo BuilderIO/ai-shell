@@ -51,7 +51,6 @@ export async function getScriptAndInfo({
   const iterableStream = streamToIterable(stream);
   return {
     readScript: readData(iterableStream, ...shellCodeExclusions),
-    readInfo: readData(iterableStream, ...shellCodeExclusions),
   };
 }
 
@@ -218,6 +217,13 @@ export const readData =
         for (const payload of payloads) {
           if (payload.includes('[DONE]') || stopTextStream) {
             dataStart = false;
+            if (!data && buffer) {
+              const cleaned = stripRegexPatterns(buffer, excluded);
+              if (cleaned) {
+                data = cleaned;
+                writer(cleaned);
+              }
+            }
             resolve(data);
             return;
           }
@@ -256,6 +262,14 @@ export const readData =
           return delta.choices?.[0]?.delta?.content ?? '';
         } catch (error) {
           return `Error with JSON.parse and ${payload}.\n${error}`;
+        }
+      }
+
+      if (!data && buffer) {
+        const cleaned = stripRegexPatterns(buffer, excluded);
+        if (cleaned) {
+          data = cleaned;
+          writer(cleaned);
         }
       }
 
