@@ -13,7 +13,6 @@ import type { AxiosError } from 'axios';
 import { streamToString } from './stream-to-string';
 import './replace-all-polyfill';
 import i18n from './i18n';
-import { stripRegexPatterns } from './strip-regex-patterns';
 import readline from 'readline';
 
 const explainInSecondRequest = true;
@@ -25,9 +24,6 @@ function getOpenAi(key: string, apiEndpoint: string) {
   return openAi;
 }
 
-// Openai outputs markdown format for code blocks. It oftne uses
-// a github style like: "```bash"
-const shellCodeExclusions = [/```[a-zA-Z]*\n/gi, /```[a-zA-Z]*/gi, '\n'];
 
 export async function getScriptAndInfo({
   prompt,
@@ -50,7 +46,7 @@ export async function getScriptAndInfo({
   });
   const iterableStream = streamToIterable(stream);
   return {
-    readScript: readData(iterableStream, ...shellCodeExclusions),
+    readScript: readData(iterableStream),
   };
 }
 
@@ -181,9 +177,10 @@ export async function getRevision({
   });
   const iterableStream = streamToIterable(stream);
   return {
-    readScript: readData(iterableStream, ...shellCodeExclusions),
+    readScript: readData(iterableStream),
   };
 }
+
 
 export const readData =
   (
@@ -193,13 +190,10 @@ export const readData =
   (writer: (data: string) => void): Promise<string> =>
     new Promise(async (resolve) => {
       let stopTextStream = false;
-      let data = '';
+      let raw = '';
       let content = '';
-      let dataStart = false;
-      let buffer = ''; // This buffer will temporarily hold incoming data only for detecting the start
 
-      const [excludedPrefix] = excluded;
-      const stopTextStreamKeys = ['q', 'escape']; //Group of keys that stop the text stream
+      const stopTextStreamKeys = ['q', 'escape'];
 
       const rl = readline.createInterface({
         input: process.stdin,
@@ -216,50 +210,15 @@ export const readData =
         const payloads = chunk.toString().split('\n\n');
         for (const payload of payloads) {
           if (payload.includes('[DONE]') || stopTextStream) {
-            dataStart = false;
-            if (!data && buffer) {
-              const cleaned = stripRegexPatterns(buffer, excluded);
-              if (cleaned) {
-                data = cleaned;
-                writer(cleaned);
-              }
-            }
-            resolve(data);
+            resolve(raw.trim());
             return;
           }
 
           if (payload.startsWith('data:')) {
             content = parseContent(payload);
-            // Use buffer only for start detection
-            if (!dataStart) {
-              // Append content to the buffer
-              buffer += content;
-              if (buffer.match(excludedPrefix ?? '')) {
-                dataStart = true;
-                // Extract content after the code block start marker
-                const afterMatch = excludedPrefix
-                  ? buffer.replace(excludedPrefix, '')
-                  : '';
-                buffer = '';
-                if (afterMatch) {
-                  const cleaned = stripRegexPatterns(afterMatch, excluded);
-                  if (cleaned) {
-                    data += cleaned;
-                    writer(cleaned);
-                  }
-                }
-                if (excludedPrefix) break;
-              }
-            }
-
-            if (dataStart && content) {
-              const contentWithoutExcluded = stripRegexPatterns(
-                content,
-                excluded
-              );
-
-              data += contentWithoutExcluded;
-              writer(contentWithoutExcluded);
+            if (content) {
+              raw += content;
+              writer(content);
             }
           }
         }
@@ -271,19 +230,11 @@ export const readData =
           const delta = JSON.parse(data.trim());
           return delta.choices?.[0]?.delta?.content ?? '';
         } catch (error) {
-          return `Error with JSON.parse and ${payload}.\n${error}`;
+          return '';
         }
       }
 
-      if (!data && buffer) {
-        const cleaned = stripRegexPatterns(buffer, excluded);
-        if (cleaned) {
-          data = cleaned;
-          writer(cleaned);
-        }
-      }
-
-      resolve(data);
+      resolve(raw.trim());
     });
 
 function getExplanationPrompt(script: string) {
@@ -312,7 +263,7 @@ function getOperationSystemDetails() {
   return os.name();
 }
 const generationDetails = dedent`
-    Only reply with the single line command surrounded by three backticks. It must be able to be directly run in the target shell. Do not include any other text.
+    Only reply with the single line command. It must be able to be directly run in the target shell. Do not include any other text, explanations, or markdown formatting.
 
     Make sure the command runs on ${getOperationSystemDetails()} operating system.
   `;
