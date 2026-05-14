@@ -60,6 +60,10 @@ type ConfigKeys = keyof typeof configParsers;
 
 type RawConfig = {
   [key in ConfigKeys]?: string;
+} & {
+  // Backwards compatibility for config files written before MODEL was
+  // promoted to the canonical uppercase key.
+  model?: string;
 };
 
 type ValidConfig = {
@@ -92,7 +96,10 @@ export const getConfig = async (
 
   for (const key of Object.keys(configParsers) as ConfigKeys[]) {
     const parser = configParsers[key];
-    const value = cliConfig?.[key] ?? config[key];
+    const value =
+      key === 'MODEL'
+        ? cliConfig?.MODEL ?? cliConfig?.model ?? config.MODEL ?? config.model
+        : cliConfig?.[key] ?? config[key];
     parsedConfig[key] = parser(value);
   }
 
@@ -109,6 +116,10 @@ export const setConfigs = async (keyValues: [key: string, value: string][]) => {
 
     const parsed = configParsers[key as ConfigKeys](value);
     config[key as ConfigKeys] = parsed as any;
+
+    if (key === 'MODEL') {
+      delete config.model;
+    }
   }
 
   await fs.writeFile(configPath, ini.stringify(config), 'utf8');
