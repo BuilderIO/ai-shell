@@ -5,6 +5,7 @@ import {
   getExplanation,
   getRevision,
   getScriptAndInfo,
+  extractCommand,
 } from './helpers/completion';
 import { getConfig } from './helpers/config';
 import { projectName } from './helpers/constants';
@@ -115,7 +116,7 @@ export async function prompt({
   const thePrompt = usePrompt || (await getPrompt());
   const spin = p.spinner();
   spin.start(i18n.t(`Loading...`));
-  const { readInfo, readScript } = await getScriptAndInfo({
+  const { readScript } = await getScriptAndInfo({
     prompt: thePrompt,
     key,
     model,
@@ -123,27 +124,25 @@ export async function prompt({
   });
   spin.stop(`${i18n.t('Your script')}:`);
   console.log('');
-  const script = await readScript(process.stdout.write.bind(process.stdout));
+  const rawScript = await readScript(process.stdout.write.bind(process.stdout));
+  const script = extractCommand(rawScript);
   console.log('');
   console.log('');
   console.log(dim('•'));
   if (!skipCommandExplanation) {
     spin.start(i18n.t(`Getting explanation...`));
-    const info = await readInfo(process.stdout.write.bind(process.stdout));
-    if (!info) {
-      const { readExplanation } = await getExplanation({
-        script,
-        key,
-        model,
-        apiEndpoint,
-      });
-      spin.stop(`${i18n.t('Explanation')}:`);
-      console.log('');
-      await readExplanation(process.stdout.write.bind(process.stdout));
-      console.log('');
-      console.log('');
-      console.log(dim('•'));
-    }
+    const { readExplanation } = await getExplanation({
+      script,
+      key,
+      model,
+      apiEndpoint,
+    });
+    spin.stop(`${i18n.t('Explanation')}:`);
+    console.log('');
+    await readExplanation(process.stdout.write.bind(process.stdout));
+    console.log('');
+    console.log('');
+    console.log(dim('•'));
   }
 
   await runOrReviseFlow(script, key, model, apiEndpoint, silentMode);
@@ -238,7 +237,8 @@ async function revisionFlow(
   spin.stop(`${i18n.t(`Your new script`)}:`);
 
   console.log('');
-  const script = await readScript(process.stdout.write.bind(process.stdout));
+  const rawScript = await readScript(process.stdout.write.bind(process.stdout));
+  const script = extractCommand(rawScript);
   console.log('');
   console.log('');
   console.log(dim('•'));
