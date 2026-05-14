@@ -5,6 +5,7 @@ import {
   getExplanation,
   getRevision,
   getScriptAndInfo,
+  extractCommand,
 } from './helpers/completion';
 import { getConfig } from './helpers/config';
 import { projectName } from './helpers/constants';
@@ -123,7 +124,8 @@ export async function prompt({
   });
   spin.stop(`${i18n.t('Your script')}:`);
   console.log('');
-  const script = await readScript(process.stdout.write.bind(process.stdout));
+  const rawScript = await readScript(process.stdout.write.bind(process.stdout));
+  const script = extractCommand(rawScript);
   console.log('');
   console.log('');
   console.log(dim('•'));
@@ -235,7 +237,8 @@ async function revisionFlow(
   spin.stop(`${i18n.t(`Your new script`)}:`);
 
   console.log('');
-  const script = await readScript(process.stdout.write.bind(process.stdout));
+  const rawScript = await readScript(process.stdout.write.bind(process.stdout));
+  const script = extractCommand(rawScript);
   console.log('');
   console.log('');
   console.log(dim('•'));

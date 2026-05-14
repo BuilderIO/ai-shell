@@ -180,7 +180,20 @@ export async function getRevision({
     readScript: readData(iterableStream),
   };
 }
-
+export function extractCommand(raw: string): string {
+  // Case 1: Standard code block with newline after language identifier
+  const match = raw.match(/```[a-zA-Z]*\n([\s\S]*?)```/);
+  if (match) {
+    return match[1].trim();
+  }
+  // Case 2: Code block without newline (```command```)
+  const noNewlineMatch = raw.match(/```([\s\S]*?)```/);
+  if (noNewlineMatch) {
+    return noNewlineMatch[1].trim();
+  }
+  // Case 3: No code blocks, return as-is
+  return raw.trim();
+}
 
 export const readData =
   (
