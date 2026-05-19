@@ -202,51 +202,74 @@ export const readData =
       const [excludedPrefix] = excluded;
       const stopTextStreamKeys = ['q', 'escape']; //Group of keys that stop the text stream
 
-      const rl = readline.createInterface({
-        input: process.stdin,
-      });
+      const input = process.stdin;
+      const canUseRawInput =
+        input.isTTY && typeof input.setRawMode === 'function';
+      const rl = canUseRawInput
+        ? readline.createInterface({
+            input,
+            terminal: true,
+          })
+        : undefined;
 
-      process.stdin.setRawMode(true);
-
-      process.stdin.on('keypress', (key, data) => {
-        if (stopTextStreamKeys.includes(data.name)) {
+      const stopOnKeypress = (_key: string, data: readline.Key) => {
+        if (data?.name && stopTextStreamKeys.includes(data.name)) {
           stopTextStream = true;
         }
-      });
-      for await (const chunk of iterableStream) {
-        const payloads = chunk.toString().split('\n\n');
-        for (const payload of payloads) {
-          if (payload.includes('[DONE]') || stopTextStream) {
-            dataStart = false;
-            resolve(data);
-            return;
-          }
+      };
 
-          if (payload.startsWith('data:')) {
-            content = parseContent(payload);
-            // Use buffer only for start detection
-            if (!dataStart) {
-              // Append content to the buffer
-              buffer += content;
-              if (buffer.match(excludedPrefix ?? '')) {
-                dataStart = true;
-                // Clear the buffer once it has served its purpose
-                buffer = '';
-                if (excludedPrefix) break;
-              }
+      const cleanupKeypress = () => {
+        input.off('keypress', stopOnKeypress);
+        if (canUseRawInput) {
+          input.setRawMode(false);
+        }
+        rl?.close();
+      };
+
+      if (canUseRawInput) {
+        readline.emitKeypressEvents(input, rl);
+        input.setRawMode(true);
+        input.on('keypress', stopOnKeypress);
+      }
+
+      try {
+        for await (const chunk of iterableStream) {
+          const payloads = chunk.toString().split('\n\n');
+          for (const payload of payloads) {
+            if (payload.includes('[DONE]') || stopTextStream) {
+              dataStart = false;
+              resolve(data);
+              return;
             }
 
-            if (dataStart && content) {
-              const contentWithoutExcluded = stripRegexPatterns(
-                content,
-                excluded
-              );
+            if (payload.startsWith('data:')) {
+              content = parseContent(payload);
+              // Use buffer only for start detection
+              if (!dataStart) {
+                // Append content to the buffer
+                buffer += content;
+                if (buffer.match(excludedPrefix ?? '')) {
+                  dataStart = true;
+                  // Clear the buffer once it has served its purpose
+                  buffer = '';
+                  if (excludedPrefix) break;
+                }
+              }
 
-              data += contentWithoutExcluded;
-              writer(contentWithoutExcluded);
+              if (dataStart && content) {
+                const contentWithoutExcluded = stripRegexPatterns(
+                  content,
+                  excluded
+                );
+
+                data += contentWithoutExcluded;
+                writer(contentWithoutExcluded);
+              }
             }
           }
         }
+      } finally {
+        cleanupKeypress();
       }
 
       function parseContent(payload: string): string {
