@@ -20,6 +20,7 @@ export default command(
       OPENAI_KEY: key,
       OPENAI_API_ENDPOINT: apiEndpoint,
       MODEL: model,
+      ENABLE_THINKING: enableThinking,
     } = await getConfig();
     const chatHistory: ChatCompletionRequestMessage[] = [];
 
@@ -51,6 +52,7 @@ export default command(
         key,
         model,
         apiEndpoint,
+        enableThinking,
       });
 
       infoSpin.stop(`${green('AI Shell:')}`);
@@ -77,12 +79,14 @@ async function getResponse({
   key,
   model,
   apiEndpoint,
+  enableThinking,
 }: {
   prompt: string | ChatCompletionRequestMessage[];
   number?: number;
   model?: string;
   key: string;
   apiEndpoint: string;
+  enableThinking?: boolean;
 }) {
   const stream = await generateCompletion({
     prompt,
@@ -90,6 +94,7 @@ async function getResponse({
     model,
     number,
     apiEndpoint,
+    enableThinking,
   });
 
   const iterableStream = streamToIterable(stream);

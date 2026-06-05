@@ -34,11 +34,13 @@ export async function getScriptAndInfo({
   key,
   model,
   apiEndpoint,
+  enableThinking,
 }: {
   prompt: string;
   key: string;
   model?: string;
   apiEndpoint: string;
+  enableThinking?: boolean;
 }) {
   const fullPrompt = getFullPrompt(prompt);
   const stream = await generateCompletion({
@@ -47,6 +49,7 @@ export async function getScriptAndInfo({
     key,
     model,
     apiEndpoint,
+    enableThinking,
   });
   const iterableStream = streamToIterable(stream);
   return {
@@ -61,26 +64,37 @@ export async function generateCompletion({
   key,
   model,
   apiEndpoint,
+  enableThinking,
 }: {
   prompt: string | ChatCompletionRequestMessage[];
   number?: number;
   model?: string;
   key: string;
   apiEndpoint: string;
+  enableThinking?: boolean;
 }) {
   const openAi = getOpenAi(key, apiEndpoint);
   try {
-    const completion = await openAi.createChatCompletion(
-      {
-        model: model || 'gpt-4o-mini',
-        messages: Array.isArray(prompt)
-          ? prompt
-          : [{ role: 'user', content: prompt }],
-        n: Math.min(number, 10),
-        stream: true,
-      },
-      { responseType: 'stream' }
-    );
+    const request = {
+      model: model || 'gpt-4o-mini',
+      messages: Array.isArray(prompt)
+        ? prompt
+        : [{ role: 'user', content: prompt }],
+      n: Math.min(number, 10),
+      stream: true,
+    };
+
+    if (enableThinking !== undefined) {
+      Object.assign(request, {
+        chat_template_kwargs: {
+          enable_thinking: enableThinking,
+        },
+      });
+    }
+
+    const completion = await openAi.createChatCompletion(request as any, {
+      responseType: 'stream',
+    });
 
     return completion.data as unknown as IncomingMessage;
   } catch (err) {
@@ -141,11 +155,13 @@ export async function getExplanation({
   key,
   model,
   apiEndpoint,
+  enableThinking,
 }: {
   script: string;
   key: string;
   model?: string;
   apiEndpoint: string;
+  enableThinking?: boolean;
 }) {
   const prompt = getExplanationPrompt(script);
   const stream = await generateCompletion({
@@ -154,6 +170,7 @@ export async function getExplanation({
     number: 1,
     model,
     apiEndpoint,
+    enableThinking,
   });
   const iterableStream = streamToIterable(stream);
   return { readExplanation: readData(iterableStream) };
@@ -165,12 +182,14 @@ export async function getRevision({
   key,
   model,
   apiEndpoint,
+  enableThinking,
 }: {
   prompt: string;
   code: string;
   key: string;
   model?: string;
   apiEndpoint: string;
+  enableThinking?: boolean;
 }) {
   const fullPrompt = getRevisionPrompt(prompt, code);
   const stream = await generateCompletion({
@@ -179,6 +198,7 @@ export async function getRevision({
     number: 1,
     model,
     apiEndpoint,
+    enableThinking,
   });
   const iterableStream = streamToIterable(stream);
   return {

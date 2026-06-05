@@ -127,6 +127,16 @@ or save the option as a preference using this command:
 ai config set SILENT_MODE=true
 ```
 
+### Thinking mode
+
+For OpenAI-compatible endpoints that support `chat_template_kwargs.enable_thinking`, you can explicitly enable or disable thinking:
+
+```bash
+ai config set ENABLE_THINKING=false
+```
+
+When unset, AI Shell does not send `chat_template_kwargs`.
+
 ### Custom API endpoint
 
 You can custom OpenAI API endpoint to set OPENAI_API_ENDPOINT（default: `https://api.openai.com/v1`）
@@ -181,6 +191,7 @@ To get an interactive UI like below:
 │  ○ OpenAI Key
 │  ○ OpenAI API Endpoint
 │  ○ Silent Mode
+│  ○ Enable Thinking
 │  ● Model (gpt-4o-mini)
 │  ○ Language
 │  ○ Cancel

@@ -48,6 +48,13 @@ const configParsers = {
   SILENT_MODE(mode?: string) {
     return String(mode).toLowerCase() === 'true';
   },
+  ENABLE_THINKING(mode?: string) {
+    if (mode === undefined || mode === '') {
+      return undefined;
+    }
+
+    return String(mode).toLowerCase() === 'true';
+  },
   OPENAI_API_ENDPOINT(apiEndpoint?: string) {
     return apiEndpoint || 'https://api.openai.com/v1';
   },
@@ -143,6 +150,14 @@ export const showConfigUI = async () => {
             : i18n.t('(not set)'),
         },
         {
+          label: i18n.t('Enable Thinking'),
+          value: 'ENABLE_THINKING',
+          hint:
+            config.ENABLE_THINKING === undefined
+              ? i18n.t('(not set)')
+              : config.ENABLE_THINKING.toString(),
+        },
+        {
           label: i18n.t('Model'),
           value: 'MODEL',
           hint: hasOwn(config, 'MODEL') ? config.MODEL : i18n.t('(not set)'),
@@ -187,6 +202,14 @@ export const showConfigUI = async () => {
       });
       if (p.isCancel(silentMode)) return;
       await setConfigs([['SILENT_MODE', silentMode ? 'true' : 'false']]);
+    } else if (choice === 'ENABLE_THINKING') {
+      const enableThinking = await p.confirm({
+        message: i18n.t('Enable thinking?'),
+      });
+      if (p.isCancel(enableThinking)) return;
+      await setConfigs([
+        ['ENABLE_THINKING', enableThinking ? 'true' : 'false'],
+      ]);
     } else if (choice === 'MODEL') {
       const { OPENAI_KEY: key, OPENAI_API_ENDPOINT: apiEndpoint } =
         await getConfig();

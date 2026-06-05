@@ -106,6 +106,7 @@ export async function prompt({
     SILENT_MODE,
     OPENAI_API_ENDPOINT: apiEndpoint,
     MODEL: model,
+    ENABLE_THINKING: enableThinking,
   } = await getConfig();
   const skipCommandExplanation = silentMode || SILENT_MODE;
 
@@ -120,6 +121,7 @@ export async function prompt({
     key,
     model,
     apiEndpoint,
+    enableThinking,
   });
   spin.stop(`${i18n.t('Your script')}:`);
   console.log('');
@@ -136,6 +138,7 @@ export async function prompt({
         key,
         model,
         apiEndpoint,
+        enableThinking,
       });
       spin.stop(`${i18n.t('Explanation')}:`);
       console.log('');
@@ -146,7 +149,14 @@ export async function prompt({
     }
   }
 
-  await runOrReviseFlow(script, key, model, apiEndpoint, silentMode);
+  await runOrReviseFlow(
+    script,
+    key,
+    model,
+    apiEndpoint,
+    silentMode,
+    enableThinking
+  );
 }
 
 async function runOrReviseFlow(
@@ -154,7 +164,8 @@ async function runOrReviseFlow(
   key: string,
   model: string,
   apiEndpoint: string,
-  silentMode?: boolean
+  silentMode?: boolean,
+  enableThinking?: boolean
 ) {
   const emptyScript = script.trim() === '';
 
@@ -191,7 +202,14 @@ async function runOrReviseFlow(
         label: '🔁 ' + i18n.t('Revise'),
         hint: i18n.t('Give feedback via prompt and get a new result'),
         value: async () => {
-          await revisionFlow(script, key, model, apiEndpoint, silentMode);
+          await revisionFlow(
+            script,
+            key,
+            model,
+            apiEndpoint,
+            silentMode,
+            enableThinking
+          );
         },
       },
       {
@@ -223,7 +241,8 @@ async function revisionFlow(
   key: string,
   model: string,
   apiEndpoint: string,
-  silentMode?: boolean
+  silentMode?: boolean,
+  enableThinking?: boolean
 ) {
   const revision = await promptForRevision();
   const spin = p.spinner();
@@ -234,6 +253,7 @@ async function revisionFlow(
     key,
     model,
     apiEndpoint,
+    enableThinking,
   });
   spin.stop(`${i18n.t(`Your new script`)}:`);
 
@@ -251,6 +271,7 @@ async function revisionFlow(
       key,
       model,
       apiEndpoint,
+      enableThinking,
     });
 
     infoSpin.stop(`${i18n.t('Explanation')}:`);
@@ -261,7 +282,14 @@ async function revisionFlow(
     console.log(dim('•'));
   }
 
-  await runOrReviseFlow(script, key, model, apiEndpoint, silentMode);
+  await runOrReviseFlow(
+    script,
+    key,
+    model,
+    apiEndpoint,
+    silentMode,
+    enableThinking
+  );
 }
 
 export const parseAssert = (name: string, condition: any, message: string) => {
