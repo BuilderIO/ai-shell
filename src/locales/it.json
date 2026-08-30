@@ -51,6 +51,7 @@
   "Shell detection failed unexpectedly": "Rilevamento shell fallito inaspettatamente",
   "Invalid model": "Modello non valido",
   "Error": "Errore",
+  "Missing required parameter": "Parametro obbligatorio mancante",
   "Please open a Bug report with the information above": "Apri un report di bug con le informazioni sopra",
   "Prompt to run": "Prompt da eseguire",
   "You": "Tu"

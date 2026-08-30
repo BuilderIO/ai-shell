@@ -4,7 +4,7 @@
   "send a message ('exit' to quit)": "kirim pesan ('exit' untuk keluar)",
   "Please enter a prompt.": "Silakan masukkan permintaan.",
   "THINKING...": "BERPIKIR...",
-  "Please set your OpenAI API key via ai config set OPENAI_KEY=<your token>": "Harap atur kunci API OpenAI Anda melalui ai config set OPENAI_KEY=<token Anda>",
+  "Please set your OpenAI API key via `ai config set OPENAI_KEY=<your token>`": "Harap atur kunci API OpenAI Anda melalui `ai config set OPENAI_KEY=<token Anda>`",
   "Set config": "Atur konfigurasi",
   "Enter your OpenAI API key": "Masukkan kunci API OpenAI Anda",
   "(not set)": "(belum diatur)",
