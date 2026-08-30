@@ -13,6 +13,7 @@ import arTranslation from '../locales/ar.json';
 import ptTranslation from '../locales/pt.json';
 import idTranslation from '../locales/id.json';
 import itTranslation from '../locales/it.json';
+import trTranslation from '../locales/tr.json';
 
 let currentlang: string = 'en';
 
@@ -32,6 +33,7 @@ const languages: Record<string, string> = {
   pt: 'Português', // Portuguese
   id: 'Indonesia', // Indonesia
   it: 'Italiano', // Italian
+  tr: 'Türkçe', // Turkish
 };
 
 i18next.init({
@@ -79,6 +81,9 @@ i18next.init({
     },
     it: {
       translation: itTranslation,
+    },
+    tr: {
+      translation: trTranslation,
     },
   },
 });
