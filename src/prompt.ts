@@ -36,6 +36,44 @@ const sample = <T>(arr: T[]): T | undefined => {
   return len ? arr[Math.floor(Math.random() * len)] : undefined;
 };
 
+async function showExplanation(
+  script: string,
+  key: string,
+  model: string,
+  apiEndpoint: string
+) {
+  const infoSpin = p.spinner();
+  infoSpin.start(i18n.t('Getting explanation...'));
+  const { readExplanation } = await getExplanation({
+    script,
+    key,
+    model,
+    apiEndpoint,
+  });
+
+  infoSpin.stop(`${i18n.t('Explanation')}:`);
+  console.log('');
+  await readExplanation(process.stdout.write.bind(process.stdout));
+  console.log('');
+  console.log('');
+  console.log(dim('•'));
+}
+
+export function shouldOfferExplanation(
+  silentMode: boolean | undefined,
+  emptyScript: boolean
+): boolean {
+  return Boolean(silentMode) && !emptyScript;
+}
+
+export function createExplanationOption(explain: () => Promise<void>) {
+  return {
+    label: '💡 ' + i18n.t('Explanation'),
+    hint: i18n.t('Getting explanation...'),
+    value: explain,
+  };
+}
+
 async function runScript(script: string) {
   p.outro(`${i18n.t('Running')}: ${script}`);
   console.log('');
@@ -131,22 +169,20 @@ export async function prompt({
     spin.start(i18n.t(`Getting explanation...`));
     const info = await readInfo(process.stdout.write.bind(process.stdout));
     if (!info) {
-      const { readExplanation } = await getExplanation({
-        script,
-        key,
-        model,
-        apiEndpoint,
-      });
       spin.stop(`${i18n.t('Explanation')}:`);
-      console.log('');
-      await readExplanation(process.stdout.write.bind(process.stdout));
-      console.log('');
-      console.log('');
-      console.log(dim('•'));
+      await showExplanation(script, key, model, apiEndpoint);
+    } else {
+      spin.stop(`${i18n.t('Explanation')}:`);
     }
   }
 
-  await runOrReviseFlow(script, key, model, apiEndpoint, silentMode);
+  await runOrReviseFlow(
+    script,
+    key,
+    model,
+    apiEndpoint,
+    skipCommandExplanation
+  );
 }
 
 async function runOrReviseFlow(
@@ -157,6 +193,7 @@ async function runOrReviseFlow(
   silentMode?: boolean
 ) {
   const emptyScript = script.trim() === '';
+  const offerExplanation = shouldOfferExplanation(silentMode, emptyScript);
 
   const answer: symbol | (() => any) = await p.select({
     message: emptyScript
@@ -194,6 +231,13 @@ async function runOrReviseFlow(
           await revisionFlow(script, key, model, apiEndpoint, silentMode);
         },
       },
+      ...(offerExplanation
+        ? [
+            createExplanationOption(() =>
+              showExplanation(script, key, model, apiEndpoint)
+            ),
+          ]
+        : []),
       {
         label: '📋 ' + i18n.t('Copy'),
         hint: i18n.t('Copy the generated script to your clipboard'),
@@ -244,21 +288,7 @@ async function revisionFlow(
   console.log(dim('•'));
 
   if (!silentMode) {
-    const infoSpin = p.spinner();
-    infoSpin.start(i18n.t(`Getting explanation...`));
-    const { readExplanation } = await getExplanation({
-      script,
-      key,
-      model,
-      apiEndpoint,
-    });
-
-    infoSpin.stop(`${i18n.t('Explanation')}:`);
-    console.log('');
-    await readExplanation(process.stdout.write.bind(process.stdout));
-    console.log('');
-    console.log('');
-    console.log(dim('•'));
+    await showExplanation(script, key, model, apiEndpoint);
   }
 
   await runOrReviseFlow(script, key, model, apiEndpoint, silentMode);
