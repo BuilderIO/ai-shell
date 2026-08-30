@@ -66,6 +66,10 @@ type ValidConfig = {
   [Key in ConfigKeys]: ReturnType<(typeof configParsers)[Key]>;
 };
 
+type GetConfigOptions = {
+  allowMissingKey?: boolean;
+};
+
 const configPath = path.join(os.homedir(), '.ai-shell');
 
 const fileExists = (filePath: string) =>
@@ -85,7 +89,8 @@ const readConfigFile = async (): Promise<RawConfig> => {
 };
 
 export const getConfig = async (
-  cliConfig?: RawConfig
+  cliConfig?: RawConfig,
+  options: GetConfigOptions = {}
 ): Promise<ValidConfig> => {
   const config = await readConfigFile();
   const parsedConfig: Record<string, unknown> = {};
@@ -93,6 +98,9 @@ export const getConfig = async (
   for (const key of Object.keys(configParsers) as ConfigKeys[]) {
     const parser = configParsers[key];
     const value = cliConfig?.[key] ?? config[key];
+    if (key === 'OPENAI_KEY' && options.allowMissingKey && !value) {
+      continue;
+    }
     parsedConfig[key] = parser(value);
   }
 
@@ -114,9 +122,23 @@ export const setConfigs = async (keyValues: [key: string, value: string][]) => {
   await fs.writeFile(configPath, ini.stringify(config), 'utf8');
 };
 
+const customModelValue = '__custom_model__';
+
+export function getModelSelectionOptions(models: Pick<Model, 'id'>[]) {
+  return [
+    ...models
+      .filter((model) => typeof model.id === 'string' && model.id.trim())
+      .map((model) => ({ value: model.id, label: model.id })),
+    {
+      label: i18n.t('Enter the model you want to use'),
+      value: customModelValue,
+    },
+  ];
+}
+
 export const showConfigUI = async () => {
   try {
-    const config = await getConfig();
+    const config = await getConfig(undefined, { allowMissingKey: true });
     const choice = (await p.select({
       message: i18n.t('Set config') + ':',
       options: [
@@ -189,16 +211,42 @@ export const showConfigUI = async () => {
       await setConfigs([['SILENT_MODE', silentMode ? 'true' : 'false']]);
     } else if (choice === 'MODEL') {
       const { OPENAI_KEY: key, OPENAI_API_ENDPOINT: apiEndpoint } =
-        await getConfig();
-      const models = await getModels(key, apiEndpoint);
-      const model = (await p.select({
-        message: 'Pick a model.',
-        options: models.map((m: Model) => {
-          return { value: m.id, label: m.id };
-        }),
-      })) as string;
+        await getConfig(undefined, { allowMissingKey: true });
+      let models: Model[] = [];
+      if (key) {
+        try {
+          models = await getModels(key, apiEndpoint);
+        } catch {
+          // A custom endpoint may not implement /models. Offer manual entry.
+        }
+      }
+
+      let model = models.length
+        ? ((await p.select({
+            message: 'Pick a model.',
+            options: getModelSelectionOptions(models),
+          })) as string)
+        : ((await p.text({
+            message: i18n.t('Enter the model you want to use'),
+            validate: (value) => {
+              if (!value.trim()) {
+                return i18n.t('Please enter a prompt.');
+              }
+            },
+          })) as string);
 
       if (p.isCancel(model)) return;
+      if (model === customModelValue) {
+        model = (await p.text({
+          message: i18n.t('Enter the model you want to use'),
+          validate: (value) => {
+            if (!value.trim()) {
+              return i18n.t('Please enter a prompt.');
+            }
+          },
+        })) as string;
+        if (p.isCancel(model)) return;
+      }
       await setConfigs([['MODEL', model]]);
     } else if (choice === 'LANGUAGE') {
       const language = (await p.select({

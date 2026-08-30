@@ -18,7 +18,7 @@ import readline from 'readline';
 
 const explainInSecondRequest = true;
 
-function getOpenAi(key: string, apiEndpoint: string) {
+function getOpenAi(key: string | undefined, apiEndpoint: string) {
   const openAi = new OpenAIApi(
     new Configuration({ apiKey: key, basePath: apiEndpoint })
   );
@@ -320,11 +320,16 @@ function getRevisionPrompt(prompt: string, code: string) {
 }
 
 export async function getModels(
-  key: string,
+  key: string | undefined,
   apiEndpoint: string
 ): Promise<Model[]> {
   const openAi = getOpenAi(key, apiEndpoint);
   const response = await openAi.listModels();
 
-  return response.data.data.filter((model) => model.object === 'model');
+  return response.data.data.filter(
+    (model) =>
+      model.object === 'model' &&
+      typeof model.id === 'string' &&
+      model.id.trim().length > 0
+  );
 }
